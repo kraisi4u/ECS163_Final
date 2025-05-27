@@ -52,14 +52,18 @@ function countOccurrences(arr) {
 
 /**
  * Function to build all static visualizations for the mother's qualifications.
+ * Currently will render a pi chart of the distribution of mother's qualification and a bar chart  
  * @param {raw dataset to draw from} data 
  * @param {x cordinate to draw viz} cordX 
  * @param {y cordinate to draw viz} cordY 
  */
 function motherQuals(data, cordX, cordY){
+
+    //extract and map data from codes to readble labels
     const motherQuals = data.map(d => translateEducationCode(d["Mother's qualification"]));
     const counts = countOccurrences(motherQuals);
 
+    //count up each of the qualifications
     const qualCountsArray = Object.entries(counts).map(([qualification, count]) => ({
         qualification,
         count
@@ -73,7 +77,7 @@ function motherQuals(data, cordX, cordY){
     //draw pi chart
     drawPiChart(processedData, '#graph1', cordX, cordY, showDrilldownChart, "Mother's Qualifications Distribution");
 
-    //Establish ordering of most qualified to least qualifie
+    //Establish ordering of most qualified to least qualified to prepare data for bar chart
     const ordering = [
         "Higher Education - Doctorate (3rd cycle)",
         "Higher Education - Doctorate",
@@ -115,9 +119,8 @@ function motherQuals(data, cordX, cordY){
     console.log("orderedArr", orderedArr);
     //draw bar chart
     drawBarChart(orderedArr, "#graph1", cordX, cordY, "Mother's Qualification vs Dropout Rate");
-
-      //TODO: Draw bar graph
 }
+     
 
 /**
  * Function to build all static visualizations for the father's qualifications.
@@ -138,6 +141,49 @@ function fatherQuals(data, cordX, cordY){
     //process data to consolidate small slices
     const processedData = consolidateSmallSlices(qualCountsArray, 40)
     drawPiChart(processedData, '#graph1', cordX, cordY, showDrilldownChart, "Father's Qualifications Distribution");
+
+    //Establish ordering of most qualified to least qualified to prepare data for bar chart
+    const ordering = [
+        "Higher Education - Doctorate (3rd cycle)",
+        "Higher Education - Doctorate",
+        "Higher Education - Master (2nd cycle)",
+        "Higher Education - Master's",
+        "Higher Education - Degree",
+        "Higher education - degree (1st cycle)",
+        "Higher Education - Bachelor's Degree",
+        "Specialized higher studies course",
+        "Professional higher technical course",
+        "Technological specialization course",
+        "Technical-professional course",
+        "Frequency of Higher Education",
+        "General commerce course",
+        "Secondary Education - 12th Year of Schooling or Eq.",
+        "12th Year of Schooling - Not Completed",
+        "Other - 11th Year of Schooling",
+        "11th Year of Schooling - Not Completed",
+        "Basic Education 3rd Cycle (9th/10th/11th Year) or Equiv.",
+        "10th Year of Schooling",
+        "9th Year of Schooling - Not Completed",
+        "8th year of schooling",
+        "7th Year (Old)",
+        "7th year of schooling",
+        "Basic Education 2nd Cycle (6th/7th/8th Year) or Equiv.",
+        "2nd cycle of the general high school course",
+        "Basic education 1st cycle (4th/5th year) or equiv.",
+        "Can read without having a 4th year of schooling",
+        "Can't read or write",
+        "Unknown"
+        ];
+    const proportionData = countProportions(data, "Father's qualification");
+    const orderedArr = ordering
+    .map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    })
+    console.log("orderedArr", orderedArr);
+    //draw bar chart
+    drawBarChart(orderedArr, "#graph1", cordX, cordY, "Father's Qualification vs Dropout Rate");
 }
 
 /**
