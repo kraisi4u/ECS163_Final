@@ -1,3 +1,8 @@
+/**
+ * Translate the education code to readable text
+ * @param {the actual code number to transalte} code 
+ * @returns 
+ */
 function translateEducationCode(code) {
     const codeMap = {
         1: "Secondary Education - 12th Year of Schooling or Eq.",
@@ -125,11 +130,11 @@ function consolidateSmallSlices(data, threshold) {
 
 /**
  * Helper function to show drilldown chart of a consolidated slice
- * @param {data to draw from} data
- * @param {id of svg to draw at} svg_id 
- * @param {Original title of the chart} ogTitle
- * @param {X coordinate} cordX
- * @param {Y coordinate} cordY
+ * @param {Array} data - data to draw from
+ * @param {String} svg_id  - id of svg to draw at
+ * @param {String} ogTitle - Original title of the chart
+ * @param {Int} cordX - X coordinate
+ * @param {Int} cordY - Y coordinate
  */
 function showDrilldownChart(data, svg_id, ogTitle, cordX, cordY) {
 
@@ -324,6 +329,51 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
         .text(title);
     }
 
+
+//Bar chart functionality  
+
+/**
+ * Calculates proportions of Enrolled/Graduate vs Dropout for a given factor.
+ * @param {Array} data - CSV file
+ * @param {String} factor - The factor to calcualte proportions for (e.g., "Mother's qualification" or "Father's qualification").
+ * @returns {Object} - An object where each key is a qualification, and value is { enrolledOrGraduate, dropout, enrolledOrGraduatePct, dropoutPct }
+ */
+function countProportions(data, factor) {
+    // Group counts by chosen factor 
+    const result = {};
+    data.forEach(d => {
+        const qual = d[factor];
+        const status = d.Target;
+        if (!result[qual]) {
+            result[qual] = { enrolledOrGraduate: 0, dropout: 0, total: 0 };
+        }
+        if (status === "Enrolled" || status === "Graduate") {
+            result[qual].enrolledOrGraduate += 1;
+        } else if (status === "Dropout") {
+            result[qual].dropout += 1;
+        }
+        result[qual].total += 1;
+    });
+
+    // Calculate proportions
+    Object.keys(result).forEach(qual => {
+        const { enrolledOrGraduate, dropout, total } = result[qual];
+        result[qual].enrolledOrGraduatePct = total > 0 ? enrolledOrGraduate / total : 0;
+        result[qual].dropoutPct = total > 0 ? dropout / total : 0;
+    });
+
+    return result;
+}
+
+
+
+
+
+
+
+
+
+
 /**
  * Area to test the functions
  */
@@ -331,6 +381,8 @@ d3.dsv(";", "data.csv").then(rawData =>{
     console.log("raw data", rawData);
     motherQuals(rawData, 900, 900);
     console.log("Mother's qualifications visualized successfully.");
+
+    console.log(countProportions(rawData, "Mother's qualification"));
 
 })
 
