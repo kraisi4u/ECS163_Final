@@ -64,8 +64,8 @@ function motherQuals(data, cordX, cordY){
     const counts = countOccurrences(motherQuals);
 
     //count up each of the qualifications
-    const qualCountsArray = Object.entries(counts).map(([qualification, count]) => ({
-        qualification,
+    const qualCountsArray = Object.entries(counts).map(([key, count]) => ({
+        key,
         count
     }));
     console.log("qualCountsArray", qualCountsArray);
@@ -118,7 +118,7 @@ function motherQuals(data, cordX, cordY){
     })
     console.log("orderedArr", orderedArr);
     //draw bar chart
-    drawBarChart(orderedArr, "#graph1", cordX, cordY, "Mother's Qualification vs Dropout Rate");
+    //drawBarChart(orderedArr, "#graph1", cordX, cordY, "Mother's Qualification vs Dropout Rate");
 }
      
 
@@ -206,7 +206,7 @@ function consolidateSmallSlices(data, threshold) {
   });
   if (small.length) {
     main.push({
-      qualification: "Other",
+      key: "Other",
       count: smallSum,
       _otherData: small
     });
@@ -225,7 +225,7 @@ function consolidateSmallSlices(data, threshold) {
 function showDrilldownChart(data, svg_id, ogTitle, cordX, cordY) {
 
     console.log("drill called")
-    const otherSlice = data.find(d => d.qualification === "Other");
+    const otherSlice = data.find(d => d.key === "Other");
     if (!otherSlice || !otherSlice._otherData) {
         console.error("No _otherData found for label:", label, data);
         return;
@@ -247,7 +247,7 @@ function showDrilldownChart(data, svg_id, ogTitle, cordX, cordY) {
 
 /**
  * Draw pi chart with d3js
- * @param {Array} data - Array of objects, each with { qualification, count }
+ * @param {Array} data - Array of objects, each with { key, count }
  * @param {String} svg_id - SVG selector (e.g., "#mySVG")
  * @param {Number} cordX - X coordinate (not used in this example)
  * @param {Number} cordY - Y coordinate (not used in this example)
@@ -312,7 +312,7 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
         .on("mouseover", function(d) { //Interactive tooltip on hover
             tooltip.style("opacity", 1);
             tooltip.select("text")
-                .text(`${d.data.qualification} (${d.data.count})`);
+                .text(`${d.data.key} (${d.data.count})`);
 
                 // Get text size for rect
                 const textElem = tooltip.select("text").node();
@@ -340,7 +340,7 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
             tooltip.style("opacity", 0);
         })
         .on("click", function(d) { //Clicking on Other allows for drill down pi chart of other smaller slices 
-        if(d.data.qualification === "Other" && d.data._otherData && typeof onOtherClick === "function") {
+        if(d.data.key === "Other" && d.data._otherData && typeof onOtherClick === "function") {
             onOtherClick(data, svg_id, title, cordX, cordY);
         }
         })
@@ -397,7 +397,7 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
         return midAngle(d) < Math.PI ? "start" : "end";
     })
     .text(function(d) {
-      return (d.endAngle - d.startAngle) > 0.2 ? d.data.qualification : "";
+      return (d.endAngle - d.startAngle) > 0.2 ? d.data.key : "";
     });
 
     function midAngle(d){ //hide label for small slices
@@ -422,7 +422,7 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
  * Calculates proportions of Enrolled/Graduate vs Dropout for a given factor.
  * @param {Array} data - CSV file
  * @param {String} factor - The factor to calcualte proportions for (e.g., "Mother's qualification" or "Father's qualification").
- * @returns {Object} - An object where each key is a qualification, and value is { enrolledOrGraduate, dropout, enrolledOrGraduatePct, dropoutPct }
+ * @returns {Object} - An object where each key is a some given factor, and value is { enrolledOrGraduate, dropout, enrolledOrGraduatePct, dropoutPct }
  */
 function countProportions(data, factor) {
     const result = {};
