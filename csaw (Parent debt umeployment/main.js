@@ -73,8 +73,48 @@ function motherQuals(data, cordX, cordY){
     //draw pi chart
     drawPiChart(processedData, '#graph1', cordX, cordY, showDrilldownChart, "Mother's Qualifications Distribution");
 
-
-
+    //Establish ordering of most qualified to least qualifie
+    const ordering = [
+        "Higher Education - Doctorate (3rd cycle)",
+        "Higher Education - Doctorate",
+        "Higher Education - Master (2nd cycle)",
+        "Higher Education - Master's",
+        "Higher Education - Degree",
+        "Higher education - degree (1st cycle)",
+        "Higher Education - Bachelor's Degree",
+        "Specialized higher studies course",
+        "Professional higher technical course",
+        "Technological specialization course",
+        "Technical-professional course",
+        "Frequency of Higher Education",
+        "General commerce course",
+        "Secondary Education - 12th Year of Schooling or Eq.",
+        "12th Year of Schooling - Not Completed",
+        "Other - 11th Year of Schooling",
+        "11th Year of Schooling - Not Completed",
+        "Basic Education 3rd Cycle (9th/10th/11th Year) or Equiv.",
+        "10th Year of Schooling",
+        "9th Year of Schooling - Not Completed",
+        "8th year of schooling",
+        "7th Year (Old)",
+        "7th year of schooling",
+        "Basic Education 2nd Cycle (6th/7th/8th Year) or Equiv.",
+        "2nd cycle of the general high school course",
+        "Basic education 1st cycle (4th/5th year) or equiv.",
+        "Can read without having a 4th year of schooling",
+        "Can't read or write",
+        "Unknown"
+        ];
+    const proportionData = countProportions(data, "Mother's qualification");
+    const orderedArr = ordering
+    .map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    })
+    console.log("orderedArr", orderedArr);
+    //draw bar chart
+    drawBarChart(orderedArr, "#graph1", cordX, cordY, "Mother's Qualification vs Dropout Rate");
 
       //TODO: Draw bar graph
 }
@@ -339,27 +379,27 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
  * @returns {Object} - An object where each key is a qualification, and value is { enrolledOrGraduate, dropout, enrolledOrGraduatePct, dropoutPct }
  */
 function countProportions(data, factor) {
-    // Group counts by chosen factor 
     const result = {};
     data.forEach(d => {
         const qual = d[factor];
+        const key = translateEducationCode(qual); // Use translated code as key
         const status = d.Target;
-        if (!result[qual]) {
-            result[qual] = { enrolledOrGraduate: 0, dropout: 0, total: 0 };
+        if (!result[key]) {
+            result[key] = { enrolledOrGraduate: 0, dropout: 0, total: 0 };
         }
         if (status === "Enrolled" || status === "Graduate") {
-            result[qual].enrolledOrGraduate += 1;
+            result[key].enrolledOrGraduate += 1;
         } else if (status === "Dropout") {
-            result[qual].dropout += 1;
+            result[key].dropout += 1;
         }
-        result[qual].total += 1;
+        result[key].total += 1;
     });
 
     // Calculate proportions
-    Object.keys(result).forEach(qual => {
-        const { enrolledOrGraduate, dropout, total } = result[qual];
-        result[qual].enrolledOrGraduatePct = total > 0 ? enrolledOrGraduate / total : 0;
-        result[qual].dropoutPct = total > 0 ? dropout / total : 0;
+    Object.keys(result).forEach(key => {
+        const { enrolledOrGraduate, dropout, total } = result[key];
+        result[key].enrolledOrGraduatePct = total > 0 ? enrolledOrGraduate / total : 0;
+        result[key].dropoutPct = total > 0 ? dropout / total : 0;
     });
 
     return result;
@@ -368,9 +408,209 @@ function countProportions(data, factor) {
 
 
 
+/**
+ * Draws a grouped bar chart about a certain factor mapped to dropout rate,
+ * with drag-to-pan enabled via D3 zoom (pan only, no zoom).
+ * @param {Object} data - The result object from countProportions().
+ * @param {string} svg_id - The id of the SVG element to render the chart in.
+ * @param {string} cordX - The label for the X axis (e.g., "Qualification").
+ * @param {string} cordY - The label for the Y axis (e.g., "Percentage (%)").
+ * @param {string} title - The chart title.
+ */
+function drawBarChart(data, svg_id, cordX, cordY, title) {
+    // Prepare the labels and datasets
+    var labels = data.map(d => d.key);
+    var subgroups = ["Enrolled or Graduate", "Dropout"];
+    var chartData = data.map(d => ({
+        label: d.key,
+        "Enrolled or Graduate": d.enrolledOrGraduatePct * 100,
+        "Dropout": d.dropoutPct * 100,
+        total: d.total
+    }));
+
+    // Set up SVG dimensions and margins
+    var margin = { top: 60, right: 150, bottom: 200, left: 100 },
+        width = 900 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
+
+    // Remove existing chart if present
+    d3.select(svg_id).selectAll("*").remove();
+
+    // Create SVG and chart group
+    var svg = d3.select(svg_id)
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom);
+
+    // Main group for chart content (this is what will be panned)
+    var chartGroup = svg.append("g")
+        .attr("class", "chart-content")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // X axis
+    var x0 = d3.scaleBand()
+        .domain(labels)
+        .range([0, width])
+        .paddingInner(0.2);
+
+    var x1 = d3.scaleBand()
+        .domain(subgroups)
+        .range([0, x0.bandwidth()])
+        .padding(0.05);
+
+    // Y axis
+    var y = d3.scaleLinear()
+        .domain([0, 100])
+        .range([height, 0]);
+
+    // Colors
+    var color = d3.scaleOrdinal()
+        .domain(subgroups)
+        .range(["#36A2EB", "#FF6384"]);
+
+    // Add X axis
+    chartGroup.append("g")
+        .attr("class", "x-axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x0))
+        .selectAll("text")
+        .attr("transform", "rotate(30)")
+        .style("text-anchor", "start");
+
+    // Add Y axis
+    chartGroup.append("g")
+        .attr("class", "y-axis")
+        .call(d3.axisLeft(y));
+
+    // Y axis label
+    chartGroup.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -margin.left + 50)
+        .attr("x", -height / 2)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "13px")
+        .text("Proportion of Students (%)");
+
+    // X axis label
+    chartGroup.append("text")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom - 40)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "13px")
+        .text("Factor");
+
+    // Title
+    chartGroup.append("text")
+        .attr("x", width / 2)
+        .attr("y", -margin.top / 2 )
+        .attr("text-anchor", "middle")
+        .attr("font-size", "18px")
+        .attr("font-weight", "bold")
+        .text(title);
+
+    // Draw bars
+    var groups = chartGroup.selectAll("g.bar-group")
+        .data(chartData)
+        .enter()
+        .append("g")
+        .attr("class", "bar-group")
+        .attr("transform", function(d) { return "translate(" + x0(d.label) + ",0)"; });
+
+    //establish tooltip
+    const tooltip = svg.append("g")
+    .attr("id", "svg-tooltip")
+    .style("pointer-events", "none")
+    .style("opacity", 0);
+
+    tooltip.append("rect")
+    .attr("fill", "rgba(0,0,0,0.7)")
+    .attr("rx", 6);
+
+    tooltip.append("text")
+    .attr("fill", "white")
+    .attr("font-size", "18px")
+    .attr("x", 8)
+    .attr("y", 24);
+
+    //draw the actual bars
+    groups.selectAll("rect")
+        .data(function(d) {
+            return subgroups.map(function(key) { return { key: key, value: d[key] }; });
+        })
+        .enter()
+        .append("rect")
+        .attr("x", function(d) { return x1(d.key); })
+        .attr("y", function(d) { return y(0); })
+        .attr("width", x1.bandwidth())
+        .attr("height", 0)
+        .attr("fill", function(d) { return color(d.key); })
+        .on("mouseover", function(d) {
+            tooltip.style("opacity", 1);
+            tooltip.select("text")
+            .text(`${d.key} (${d.value})`);
+            
+            // Resize rect to fit text
+            var textElem = tooltip.select("text").node();
+            var bbox = textElem.getBBox();
+            var padding = 8;
+            tooltip.select("rect")
+            .attr("x", bbox.x - padding)
+            .attr("y", bbox.y - padding)
+            .attr("width", bbox.width + padding * 2)
+            .attr("height", bbox.height + padding * 2);
+        })
+        .on("mousemove", function() {
+            var coords = d3.mouse(svg.node()); 
+            var offsetX = 0, offsetY = 0;
+            tooltip.attr("transform", "translate(" + (coords[0] + offsetX) + "," + (coords[1] + offsetY) + ")");
+        })
+        .on("mouseout", function() {
+            tooltip.style("opacity", 0);
+        })
+        .transition()
+        .duration(800)
+        .delay(function(d, i) { return i * 80; }) // stagger bars in each group
+        .attr("y", function(d) { return y(d.value); })
+        .attr("height", function(d) { return height - y(d.value); });
 
 
 
+    // Add bar group count labels
+    groups.append("text")
+        .attr("x", x0.bandwidth() / 2)
+        .attr("y", function(d) { 
+            var maxVal = Math.max(d["Enrolled or Graduate"], d["Dropout"]);
+            return y(maxVal) - 10; 
+        })
+        .attr("text-anchor", "middle")
+        .attr("font-size", "12px")
+        .attr("fill", "#222")
+        .text(function(d) { return "n=" + d.total; });
+
+    // Add legend 
+    var legend = svg.append("g")
+        .attr("class", "legend")
+        .attr("transform", "translate(" + (margin.left) + "," + (height + margin.top + margin.bottom - subgroups.length * 24 - 10) + ")");
+
+    legend.selectAll("g")
+        .data(subgroups)
+        .enter().append("g")
+        .attr("transform", function(d, i) { return "translate(0," + (i * 24) + ")"; })
+        .each(function(d, i) {
+            d3.select(this).append("rect")
+                .attr("width", 18)
+                .attr("height", 18)
+                .attr("fill", color(d));
+            d3.select(this).append("text")
+                .attr("x", 26)
+                .attr("y", 9)
+                .attr("dy", ".35em")
+                .style("text-anchor", "start")
+                .style("font-size", "13px")
+                .text(d);
+        });
+
+
+}
 
 
 
@@ -383,6 +623,8 @@ d3.dsv(";", "data.csv").then(rawData =>{
     console.log("Mother's qualifications visualized successfully.");
 
     console.log(countProportions(rawData, "Mother's qualification"));
+    //const test = countProportions(rawData, "Mother's qualification");
+    //drawBarChart(test, "#graph1", 900, 900, "Mother's Qualification vs Dropout Rate");
 
 })
 
