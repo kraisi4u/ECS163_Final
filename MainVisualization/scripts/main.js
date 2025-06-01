@@ -10,6 +10,10 @@ import {
     loadGradeData,
     getRawDataForTwoColumns,
 } from "./dataLoader.js";
+import {
+  motherQuals,
+  fatherQuals,
+} from './csawStatVis.js';
 
 let currentSlide = 0;
 const slides = d3.selectAll(".slide");
@@ -82,6 +86,18 @@ const updateVerticalTitle = (htmlSlideIndex) => {
     titleElement.text(titleText).classed("visible", true);
 };
 
+
+/**
+ * Define mapping of of chart targets to static viz functions
+ * ADD MORE MAPPINGS HERE
+ */
+const chartFunctions = {
+    "Mother's qualification": motherQuals,
+    "Father's qualification": fatherQuals,
+    // Add more mappings as needed
+};
+
+
 /**
  * shows specific slide and handles chart visibility
  */
@@ -99,6 +115,25 @@ const showSlide = (index) => {
         permanentChartArea.classed("visible", true);
         currentSlideElement.classed("with-chart", true);
         panToSlide(index);
+
+        // Get the active alternate and its chart target
+        const activeAlternate = getActiveAlternate(currentSlideElement);
+        const chartTarget = activeAlternate.attr("data-chart-target");
+        console.log("Chart target:", chartTarget);
+        //Handle static visualizations
+        const chartFunc = chartFunctions[chartTarget];
+        console.log("Chart function:", chartFunc);
+        if (chartFunc) {
+            //clear side chart
+            d3.select("#side-chart").selectAll("svg").remove();
+            d3.select("#side-chart")
+                .append("svg")
+                .attr("id", "graph1")
+                .attr("width", 400)
+                .attr("height", 400);
+            chartFunc(allCsvData, 200, 200);
+        } 
+
     } else {
         permanentChartArea.classed("visible", false);
         slides.classed("with-chart", false);

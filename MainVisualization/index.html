@@ -90,6 +90,20 @@
                 overflow: hidden;
             }
 
+            #side-chart {
+            position: absolute;
+            top: 150px;
+            right: 0px;
+            width: 420px;
+            min-width: 320px;
+            margin-right: 0px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 12px;
+            z-index: 30;
+            }
+
             .permanent-chart-area.visible {
                 display: block;
             }
@@ -137,6 +151,7 @@
     <body>
         <!--Basically a hack for our main chart, since that shouldn't be reinstianted on each slide, so its a permanent thing that gets hidden or shown-->
         <div class="permanent-chart-area" id="permanent-chart">
+             
             <div class="chart-title-vertical" id="chart-title-vertical"></div>
         </div>
 
@@ -171,6 +186,7 @@
                     <p>Educational background of the student's father</p>
                 </div>
                 <div class="switch-alternate-button">Switch to Alternative</div>
+                <div id="side-chart"></div>
             </div>
         </div>
 
