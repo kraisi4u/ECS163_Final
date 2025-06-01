@@ -1,0 +1,502 @@
+{
+    "Marital status": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Marital status of the student",
+        "categories": {
+            "1": "single",
+            "2": "married",
+            "3": "widower",
+            "4": "divorced",
+            "5": "facto union",
+            "6": "legally separated"
+        }
+    },
+
+    "Application mode": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Admission route / application regime",
+        "categories": {
+            "1": "1st phase – general contingent",
+            "2": "Ordinance No. 612/93",
+            "5": "1st phase – special contingent (Azores Island)",
+            "7": "Holders of other higher courses",
+            "10": "Ordinance No. 854-B/99",
+            "15": "International student (bachelor)",
+            "16": "1st phase – special contingent (Madeira Island)",
+            "17": "2nd phase – general contingent",
+            "18": "3rd phase – general contingent",
+            "26": "Ordinance 533-A/99 b2) (Different Plan)",
+            "27": "Ordinance 533-A/99 b3) (Other Institution)",
+            "39": "Over 23 years old",
+            "42": "Transfer",
+            "43": "Change of course",
+            "44": "Technological specialization diploma holders",
+            "51": "Change of institution/course",
+            "53": "Short-cycle diploma holders",
+            "57": "Change of institution/course (International)"
+        }
+    },
+
+    "Application order": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Preference ranking of the chosen course (0 = 1st choice … 9 = last choice)",
+        "categories": {
+            "0": "first choice",
+            "1": "second choice",
+            "2": "third choice",
+            "3": "fourth choice",
+            "4": "fifth choice",
+            "5": "sixth choice",
+            "6": "seventh choice",
+            "7": "eighth choice",
+            "8": "ninth choice",
+            "9": "tenth choice"
+        }
+    },
+
+    "Course": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Degree programme code",
+        "categories": {
+            "33": "Biofuel Production Technologies",
+            "171": "Animation and Multimedia Design",
+            "8014": "Social Service (evening attendance)",
+            "9003": "Agronomy",
+            "9070": "Communication Design",
+            "9085": "Veterinary Nursing",
+            "9119": "Informatics Engineering",
+            "9130": "Equinculture",
+            "9147": "Management",
+            "9238": "Social Service",
+            "9254": "Tourism",
+            "9500": "Nursing",
+            "9556": "Oral Hygiene",
+            "9670": "Advertising and Marketing Management",
+            "9773": "Journalism and Communication",
+            "9853": "Basic Education",
+            "9991": "Management (evening attendance)"
+        }
+    },
+
+    "Daytime/evening attendance": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Attendance schedule",
+        "categories": {
+            "0": "evening",
+            "1": "daytime"
+        }
+    },
+
+    "Previous qualification": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Highest qualification held before enrolment (education level)",
+        "categories": {
+            "1": "Secondary education",
+            "2": "Higher education – bachelor's",
+            "3": "Higher education – degree",
+            "4": "Higher education – master's",
+            "5": "Higher education – doctorate",
+            "6": "Some higher-education attendance",
+            "9": "12th year – not completed",
+            "10": "11th year – not completed",
+            "12": "Other – 11th year",
+            "14": "10th year",
+            "15": "10th year – not completed",
+            "19": "Basic education 3rd cycle",
+            "38": "Basic education 2nd cycle",
+            "39": "Technological specialization course",
+            "40": "Higher education – degree (1st cycle)",
+            "42": "Professional higher technical course",
+            "43": "Higher education – master (2nd cycle)"
+        }
+    },
+
+    "Previous qualification (grade)": {
+        "role": "feature",
+        "type": "continuous",
+        "description": "Grade of previous qualification",
+        "range": [0, 200]
+    },
+
+    "Nacionality": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Student nationality",
+        "categories": {
+            "1": "Portuguese",
+            "2": "German",
+            "6": "Spanish",
+            "11": "Italian",
+            "13": "Dutch",
+            "14": "English",
+            "17": "Lithuanian",
+            "21": "Angolan",
+            "22": "Cape Verdean",
+            "24": "Guinean",
+            "25": "Mozambican",
+            "26": "Santomean",
+            "32": "Turkish",
+            "41": "Brazilian",
+            "62": "Romanian",
+            "100": "Moldovan",
+            "101": "Mexican",
+            "103": "Ukrainian",
+            "105": "Russian",
+            "108": "Cuban",
+            "109": "Colombian"
+        }
+    },
+
+    "Mother's qualification": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Mother’s highest qualification (education level)",
+        "categories": {
+            "1": "Secondary education – 12th year",
+            "2": "Higher education – bachelor's",
+            "3": "Higher education – degree",
+            "4": "Higher education – master's",
+            "5": "Higher education – doctorate",
+            "6": "Some higher-education attendance",
+            "9": "12th year – not completed",
+            "10": "11th year – not completed",
+            "11": "7th year (old)",
+            "12": "Other – 11th year",
+            "14": "10th year",
+            "18": "General commerce course",
+            "19": "Basic education 3rd cycle",
+            "22": "Technical-professional course",
+            "26": "7th year of schooling",
+            "27": "2nd cycle general high school",
+            "29": "9th year – not completed",
+            "30": "8th year",
+            "34": "Unknown",
+            "35": "Cannot read or write",
+            "36": "Reads w/o 4th year",
+            "37": "Basic education 1st cycle",
+            "38": "Basic education 2nd cycle",
+            "39": "Technological specialization course",
+            "40": "Higher education – degree (1st cycle)",
+            "41": "Specialized higher studies",
+            "42": "Professional higher technical course",
+            "43": "Higher education – master (2nd cycle)",
+            "44": "Higher education – doctorate (3rd cycle)"
+        }
+    },
+
+    "Father's qualification": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Father’s highest qualification (education level)",
+        "categories": {
+            "1": "Secondary education – 12th year",
+            "2": "Higher education – bachelor's",
+            "3": "Higher education – degree",
+            "4": "Higher education – master's",
+            "5": "Higher education – doctorate",
+            "6": "Some higher-education attendance",
+            "9": "12th year – not completed",
+            "10": "11th year – not completed",
+            "11": "7th year (old)",
+            "12": "Other – 11th year",
+            "13": "2nd year complementary high school",
+            "14": "10th year",
+            "18": "General commerce course",
+            "19": "Basic education 3rd cycle",
+            "20": "Complementary high school course",
+            "22": "Technical-professional course",
+            "25": "Complementary H.S. – not completed",
+            "26": "7th year of schooling",
+            "27": "2nd cycle general high school",
+            "29": "9th year – not completed",
+            "30": "8th year",
+            "31": "General Course – Administration & Commerce",
+            "33": "Supplementary Accounting & Administration",
+            "34": "Unknown",
+            "35": "Cannot read or write",
+            "36": "Reads w/o 4th year",
+            "37": "Basic education 1st cycle",
+            "38": "Basic education 2nd cycle",
+            "39": "Technological specialization course",
+            "40": "Higher education – degree (1st cycle)",
+            "41": "Specialized higher studies",
+            "42": "Professional higher technical course",
+            "43": "Higher education – master (2nd cycle)",
+            "44": "Higher education – doctorate (3rd cycle)"
+        }
+    },
+
+    "Mother's occupation": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Mother’s current occupation (ISCO-08 aggregation)",
+        "categories": {
+            "0": "Student",
+            "1": "Legislators, directors & managers",
+            "2": "Intellectual & scientific specialists",
+            "3": "Technicians & associate professionals",
+            "4": "Administrative staff",
+            "5": "Personal services, security & sales",
+            "6": "Farmers & skilled agri/forestry workers",
+            "7": "Skilled industry, construction & craftsmen",
+            "8": "Machine operators & assemblers",
+            "9": "Unskilled workers",
+            "10": "Armed forces professions",
+            "90": "Other situation",
+            "99": "Blank",
+            "122": "Health professionals",
+            "123": "Teachers",
+            "125": "ICT specialists",
+            "131": "Science & engineering technicians",
+            "132": "Health technicians",
+            "134": "Legal/social/sports/cultural technicians",
+            "141": "Office staff & secretaries",
+            "143": "Data/accounting/statistics clerks",
+            "144": "Other admin support",
+            "151": "Personal service workers",
+            "152": "Salespersons",
+            "153": "Personal care workers",
+            "171": "Skilled construction workers",
+            "173": "Printing/jewelry/artisan workers",
+            "175": "Food/wood/clothing craft workers",
+            "191": "Cleaning workers",
+            "192": "Unskilled agri/fish/forestry",
+            "193": "Unskilled industry/construction/transport",
+            "194": "Meal preparation assistants"
+        }
+    },
+
+    "Father's occupation": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Father’s current occupation (ISCO-08 aggregation)",
+        "categories": {
+            "0": "Student",
+            "1": "Legislators, directors & managers",
+            "2": "Intellectual & scientific specialists",
+            "3": "Technicians & associate professionals",
+            "4": "Administrative staff",
+            "5": "Personal services, security & sales",
+            "6": "Farmers & skilled agri/forestry workers",
+            "7": "Skilled industry, construction & craftsmen",
+            "8": "Machine operators & assemblers",
+            "9": "Unskilled workers",
+            "10": "Armed forces professions",
+            "90": "Other situation",
+            "99": "Blank",
+            "101": "Armed forces officers",
+            "102": "Armed forces sergeants",
+            "103": "Other armed forces personnel",
+            "112": "Admin & commercial services directors",
+            "114": "Hotel/catering/trade directors",
+            "121": "Physical science & engineering specialists",
+            "122": "Health professionals",
+            "123": "Teachers",
+            "124": "Finance/administration specialists",
+            "131": "Science & engineering technicians",
+            "132": "Health technicians",
+            "134": "Legal/social/sports/cultural technicians",
+            "135": "ICT technicians",
+            "141": "Office staff & secretaries",
+            "143": "Data/accounting/statistics clerks",
+            "144": "Other admin support",
+            "151": "Personal service workers",
+            "152": "Salespersons",
+            "153": "Personal care workers",
+            "154": "Protection & security personnel",
+            "161": "Market-oriented farmers",
+            "163": "Subsistence farmers/fishers/hunters",
+            "171": "Skilled construction workers",
+            "172": "Skilled metallurgy/metalwork",
+            "174": "Skilled electrical/electronics workers",
+            "175": "Food/wood/clothing craft workers",
+            "181": "Fixed-plant & machine operators",
+            "182": "Assembly workers",
+            "183": "Vehicle drivers & mobile equipment operators",
+            "192": "Unskilled agri/fish/forestry",
+            "193": "Unskilled industry/construction/transport",
+            "194": "Meal preparation assistants",
+            "195": "Street vendors & service providers"
+        }
+    },
+
+    "Admission grade": {
+        "role": "feature",
+        "type": "continuous",
+        "description": "Entrance exam grade",
+        "range": [0, 200]
+    },
+
+    "Displaced": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Student lives away from home",
+        "categories": {
+            "0": "no",
+            "1": "yes"
+        }
+    },
+
+    "Educational special needs": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Special educational needs flag",
+        "categories": {
+            "0": "no",
+            "1": "yes"
+        }
+    },
+
+    "Debtor": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Outstanding debt to institution",
+        "categories": {
+            "0": "no",
+            "1": "yes"
+        }
+    },
+
+    "Tuition fees up to date": {
+        "role": "feature",
+        "type": "integer",
+        "description": "All tuition fees paid",
+        "categories": {
+            "0": "no",
+            "1": "yes"
+        }
+    },
+
+    "Gender": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Gender",
+        "categories": {
+            "0": "female",
+            "1": "male"
+        }
+    },
+
+    "Scholarship holder": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Receives scholarship",
+        "categories": {
+            "0": "no",
+            "1": "yes"
+        }
+    },
+
+    "Age at enrollment": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Age (years) when first enrolled"
+    },
+
+    "International": {
+        "role": "feature",
+        "type": "integer",
+        "description": "International student flag",
+        "categories": {
+            "0": "no",
+            "1": "yes"
+        }
+    },
+
+    "Curricular units 1st sem (credited)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Number of curricular units credited – 1st semester"
+    },
+    "Curricular units 1st sem (enrolled)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Number of curricular units enrolled – 1st semester"
+    },
+    "Curricular units 1st sem (evaluations)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Number of evaluations taken – 1st semester"
+    },
+    "Curricular units 1st sem (approved)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Number of curricular units approved – 1st semester"
+    },
+    "Curricular units 1st sem (grade)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Average grade – 1st semester",
+        "range": [0, 20]
+    },
+    "Curricular units 1st sem (without evaluations)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Units without evaluation – 1st semester"
+    },
+
+    "Curricular units 2nd sem (credited)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Number of curricular units credited – 2nd semester"
+    },
+    "Curricular units 2nd sem (enrolled)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Number of curricular units enrolled – 2nd semester"
+    },
+    "Curricular units 2nd sem (evaluations)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Number of evaluations taken – 2nd semester"
+    },
+    "Curricular units 2nd sem (approved)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Number of curricular units approved – 2nd semester"
+    },
+    "Curricular units 2nd sem (grade)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Average grade – 2nd semester",
+        "range": [0, 20]
+    },
+    "Curricular units 2nd sem (without evaluations)": {
+        "role": "feature",
+        "type": "integer",
+        "description": "Units without evaluation – 2nd semester"
+    },
+
+    "Unemployment rate": {
+        "role": "feature",
+        "type": "continuous",
+        "description": "National unemployment rate (%)"
+    },
+    "Inflation rate": {
+        "role": "feature",
+        "type": "continuous",
+        "description": "National inflation rate (%)"
+    },
+    "GDP": {
+        "role": "feature",
+        "type": "continuous",
+        "description": "Gross Domestic Product (value)"
+    },
+
+    "Target": {
+        "role": "target",
+        "type": "categorical",
+        "description": "Student status after standard course duration",
+        "categories": {
+            "dropout": "Did not complete course",
+            "enrolled": "Still enrolled (ongoing)",
+            "graduate": "Completed course successfully"
+        }
+    }
+}

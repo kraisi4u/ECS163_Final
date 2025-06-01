@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Life of a Student</title>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="./scripts/main.js" defer type="module"></script>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                position: relative;
+                overflow: hidden; /* Prevent page scrollbar */
+            }
+
+            .slide {
+                height: 100vh;
+                display: none;
+            }
+
+            .center {
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                color: white;
+            }
+
+            .title {
+                background-color: darkslategray;
+            }
+            .chapter {
+                background-color: slategray;
+            }
+
+            .title h1 {
+                font-size: 3em;
+                margin-bottom: 20px;
+            }
+            .title h2 {
+                font-size: 1.5em;
+                font-weight: normal;
+                margin-bottom: 40px;
+            }
+            .title p {
+                font-size: 1.2em;
+            }
+            .chapter h1 {
+                font-size: 2.5em;
+            }
+
+            .container {
+                display: flex;
+                height: 100vh;
+            }
+
+            .alternates {
+                flex: 1;
+                position: relative;
+                cursor: default;
+                height: 100%;
+                padding: 20px 20px 80px 20px;
+                background-color: whitesmoke;
+                box-sizing: border-box;
+            }
+
+            .alternate {
+                display: none;
+                height: 100%;
+            }
+
+            .alternate.active {
+                display: block;
+            }
+
+            .permanent-chart-area {
+                position: fixed;
+                right: 0;
+                top: 0;
+                width: 70%;
+                height: 100vh;
+                padding: 20px;
+                background-color: white;
+                display: none;
+                z-index: 10;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
+
+            .permanent-chart-area.visible {
+                display: block;
+            }
+
+            .slide.with-chart {
+                width: 30%;
+            }
+
+            .switch-alternate-button {
+                position: absolute;
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+                padding: 15px;
+                background-color: steelblue;
+                color: white;
+                text-align: center;
+                cursor: pointer;
+                border-radius: 5px;
+                box-sizing: border-box;
+                font-weight: bold;
+            }
+
+            .chart-title-vertical {
+                position: absolute;
+                right: 1rem;
+                top: 50%;
+                transform: translateY(-50%) rotate(90deg);
+                transform-origin: right center;
+                font-size: 1.5em;
+                font-weight: bold;
+                color: darkslategray;
+                white-space: nowrap;
+                pointer-events: none;
+                z-index: 20;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .chart-title-vertical.visible {
+                opacity: 1;
+            }
+        </style>
+    </head>
+    <body>
+        <!--Basically a hack for our main chart, since that shouldn't be reinstianted on each slide, so its a permanent thing that gets hidden or shown-->
+        <div class="permanent-chart-area" id="permanent-chart">
+            <div class="chart-title-vertical" id="chart-title-vertical"></div>
+        </div>
+
+        <div class="slide">
+            <div class="center title">
+                <h1>Life of a Student</h1>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="center chapter">
+                <h1>Early Life & Background</h1>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Mother's qualification"
+                    data-chart-type="categorical"
+                >
+                    <h1>Mother's Qualification</h1>
+                    <p>Educational background of the student's mother</p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="Father's qualification"
+                    data-chart-type="categorical"
+                >
+                    <h1>Father's Qualification</h1>
+                    <p>Educational background of the student's father</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Mother's occupation"
+                    data-chart-type="categorical"
+                >
+                    <h1>Mother's Occupation</h1>
+                    <p>Professional background of the student's mother</p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="Father's occupation"
+                    data-chart-type="categorical"
+                >
+                    <h1>Father's Occupation</h1>
+                    <p>Professional background of the student's father</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Nacionality"
+                    data-chart-type="categorical"
+                >
+                    <h1>Nationality</h1>
+                    <p>Student's nationality</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="International"
+                    data-chart-type="categorical"
+                >
+                    <h1>International Status</h1>
+                    <p>Whether the student is international or domestic</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Age at enrollment"
+                    data-chart-type="categorical"
+                >
+                    <h1>Age at Enrollment</h1>
+                    <p>Age when the student enrolled</p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="Gender"
+                    data-chart-type="categorical"
+                >
+                    <h1>Gender</h1>
+                    <p>Student's gender</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="center chapter">
+                <h1>Before School</h1>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Previous qualification"
+                    data-chart-type="categorical"
+                >
+                    <h1>Previous Qualification</h1>
+                    <p>Educational background before applying to university</p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="Previous qualification (grade)"
+                    data-chart-type="grade"
+                >
+                    <h1>Previous Qualification Grade</h1>
+                    <p>Grade received in previous qualification</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Application mode"
+                    data-chart-type="categorical"
+                >
+                    <h1>Application Mode</h1>
+                    <p>How students applied to the program</p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="Application order"
+                    data-chart-type="categorical"
+                >
+                    <h1>Application Order</h1>
+                    <p>Order of application preference</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Marital status"
+                    data-chart-type="categorical"
+                >
+                    <h1>Marital Status</h1>
+                    <p>Student's marital status at time of application</p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="Displaced"
+                    data-chart-type="categorical"
+                >
+                    <h1>Displaced Status</h1>
+                    <p>Whether the student is displaced</p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="Educational special needs"
+                    data-chart-type="categorical"
+                >
+                    <h1>Educational Special Needs</h1>
+                    <p>Special educational needs or accommodations</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Course"
+                    data-chart-type="categorical"
+                >
+                    <h1>Course</h1>
+                    <p>Selected course or program of study</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Admission grade"
+                    data-chart-type="grade"
+                >
+                    <h1>Admission Grade</h1>
+                    <p>Grade received for admission to the program</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Scholarship holder"
+                    data-chart-type="categorical"
+                >
+                    <h1>Scholarship Status</h1>
+                    <p>Whether the student holds a scholarship</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="center chapter">
+                <h1>In School</h1>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Curricular units 1st sem (enrolled)"
+                    data-chart-type="categorical"
+                >
+                    <h1>First Semester - Units</h1>
+                    <p>
+                        Number of curricular units enrolled and approved in
+                        first semester
+                    </p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="Curricular units 1st sem (approved)"
+                    data-chart-type="categorical"
+                >
+                    <h1>First Semester - Approved Units</h1>
+                    <p>Number of curricular units approved in first semester</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Curricular units 1st sem (grade)"
+                    data-chart-type="grade"
+                >
+                    <h1>First Semester - Grades</h1>
+                    <p>Grades achieved in first semester</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Curricular units 2nd sem (enrolled)"
+                    data-chart-type="categorical"
+                >
+                    <h1>Second Semester - Units</h1>
+                    <p>
+                        Number of curricular units enrolled and approved in
+                        second semester
+                    </p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="Curricular units 2nd sem (approved)"
+                    data-chart-type="categorical"
+                >
+                    <h1>Second Semester - Approved Units</h1>
+                    <p>
+                        Number of curricular units approved in second semester
+                    </p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Curricular units 2nd sem (grade)"
+                    data-chart-type="grade"
+                >
+                    <h1>Second Semester - Grades</h1>
+                    <p>Grades achieved in second semester</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="center chapter">
+                <h1>Financial Conditions</h1>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Tuition fees up to date"
+                    data-chart-type="categorical"
+                >
+                    <h1>Tuition Payment Status</h1>
+                    <p>Whether tuition fees are up to date</p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="Debtor"
+                    data-chart-type="categorical"
+                >
+                    <h1>Debtor Status</h1>
+                    <p>Whether the student is a debtor</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="center chapter">
+                <h1>External Context</h1>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Unemployment rate"
+                    data-chart-type="categorical"
+                >
+                    <h1>Unemployment Rate</h1>
+                    <p>Economic indicator - unemployment rate</p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="Inflation rate"
+                    data-chart-type="categorical"
+                >
+                    <h1>Inflation Rate</h1>
+                    <p>Economic indicator - inflation rate</p>
+                </div>
+                <div
+                    class="alternate"
+                    data-chart-target="GDP"
+                    data-chart-type="categorical"
+                >
+                    <h1>GDP</h1>
+                    <p>Economic indicator - Gross Domestic Product</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+
+        <div class="slide" data-has-chart="true">
+            <div class="alternates">
+                <div
+                    class="alternate active"
+                    data-chart-target="Target
+                    data-chart-type="categorical"
+                >
+                    <h1>Outcome</h1>
+                    <p>Student's final academic outcome</p>
+                </div>
+                <div class="switch-alternate-button">Switch to Alternative</div>
+            </div>
+        </div>
+    </body>
+</html>
