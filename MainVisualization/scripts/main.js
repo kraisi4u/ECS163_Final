@@ -129,9 +129,9 @@ const showSlide = (index) => {
             d3.select("#side-chart")
                 .append("svg")
                 .attr("id", "graph1")
-                .attr("width", 400)
-                .attr("height", 400);
-            chartFunc(allCsvData, 200, 200);
+                .attr("width", 350)
+                .attr("height", 350);
+            chartFunc(allCsvData);
         } 
 
     } else {

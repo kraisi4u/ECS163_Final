@@ -63,10 +63,8 @@ function countOccurrences(arr) {
  * Function to build all static visualizations for the mother's qualifications.
  * Currently will render a pi chart of the distribution of mother's qualification and a bar chart  
  * @param {raw dataset to draw from} data 
- * @param {x cordinate to draw viz} cordX 
- * @param {y cordinate to draw viz} cordY 
  */
-function motherQuals(data, cordX, cordY){
+function motherQuals(data){
 
     //extract and map data from codes to readble labels
     const motherQuals = data.map(d => translateEducationCode(d["Mother's qualification"]));
@@ -84,7 +82,7 @@ function motherQuals(data, cordX, cordY){
     const processedData = consolidateSmallSlices(qualCountsArray, 40)
 
     //draw pi chart
-    drawPiChart(processedData, '#graph1', cordX, cordY, showDrilldownChart, "Mother's Qualifications Distribution");
+    drawPiChart(processedData, '#graph1',showDrilldownChart, "Mother's Qualifications Distribution");
 
     //Establish ordering of most qualified to least qualified to prepare data for bar chart
     const ordering = [
@@ -133,11 +131,9 @@ function motherQuals(data, cordX, cordY){
 
 /**
  * Function to build all static visualizations for the father's qualifications.
- * @param {raw dataset to draw from} data 
- * @param {x cordinate to draw viz} cordX 
- * @param {y cordinate to draw viz} cordY 
+ * @param data {csv object} raw dataset to draw from
  */
-function fatherQuals(data, cordX, cordY){
+function fatherQuals(data ){
     const fatherQuals = data.map(d => translateEducationCode(d["Father's qualification"]));
     const counts = countOccurrences(fatherQuals);
 
@@ -149,7 +145,7 @@ function fatherQuals(data, cordX, cordY){
 
     //process data to consolidate small slices
     const processedData = consolidateSmallSlices(qualCountsArray, 40)
-    drawPiChart(processedData, '#graph1', cordX, cordY, showDrilldownChart, "Father's Qualifications Distribution");
+    drawPiChart(processedData, '#graph1', showDrilldownChart, "Father's Qualifications Distribution");
 
     //Establish ordering of most qualified to least qualified to prepare data for bar chart
     const ordering = [
@@ -228,10 +224,8 @@ function consolidateSmallSlices(data, threshold) {
  * @param {Array} data - data to draw from
  * @param {String} svg_id  - id of svg to draw at
  * @param {String} ogTitle - Original title of the chart
- * @param {Int} cordX - X coordinate
- * @param {Int} cordY - Y coordinate
  */
-function showDrilldownChart(data, svg_id, ogTitle, cordX, cordY) {
+function showDrilldownChart(data, svg_id, ogTitle) {
 
     console.log("drill called")
     const otherSlice = data.find(d => d.key === "Other");
@@ -239,38 +233,59 @@ function showDrilldownChart(data, svg_id, ogTitle, cordX, cordY) {
         console.error("No _otherData found for label:", label, data);
         return;
     }
-    drawPiChart(otherSlice._otherData, svg_id, cordX, cordY, null, "Other");
+    drawPiChart(otherSlice._otherData, svg_id, null, "Other");
     // Add a Back button (optional)
     d3.select("#graph1")
       .append("text")
       .attr("x", 20)
       .attr("y", 30)
-      .attr("fill", "yellow")
-      .attr("font-size", "30px")
+      .attr("fill", "blue")
+      .attr("font-size", "10px")
       .style("cursor", "pointer")
       .text("← Back")
       .on("click", function(){
         console.log(data);
-        drawPiChart(data, svg_id, cordX, cordY, showDrilldownChart, ogTitle)});
+        drawPiChart(data, svg_id, showDrilldownChart, ogTitle)});
+}
+/**
+ * Helper function that readjusts label position based on the x coordinate.
+ * @param {Int} x - x coordinate of the label
+ * @param {Int} width - width of the chart
+ * @param {Int} padding - padding to apply to the label
+ * @returns 
+ */
+function readjustX(x, width, padding = 110) {
+    return Math.max(-width/2 + padding, Math.min(width/2 - padding, x));
 }
 
 /**
  * Draw pi chart with d3js
  * @param {Array} data - Array of objects, each with { key, count }
- * @param {String} svg_id - SVG selector (e.g., "#mySVG")
- * @param {Number} cordX - X coordinate (not used in this example)
- * @param {Number} cordY - Y coordinate (not used in this example)
+ * @param {String} svg_id - SVG to Render the chart in, e.g. "#graph1"
  * @param {onOtherClick} onOtherClick -  function to render drill downdisplay when "Other" slice is clicked
+ * @param {object} options - Options for the chart, e.g. { width: 300, height: 300, margin: 60 } For use in expanded version of chart
  */
-function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
-    const margin = 150; 
-    const width = 1000, height = 1000, radius = Math.min(width, height) / 2 - margin;
+function drawPiChart(data, svg_id, onOtherClick, title, options = {}) {
+    //Set default sizes, intended for minimized viz
+    const width = options.width || 350;
+    const height = options.height || 350;
+    const margin = options.margin || 100;
+    const radius = Math.min(width, height) / 2 - margin;
 
+    const labelFontSize = "5px";
+    const titleFontSize = "14px";
+    const tooltipFontSize = "6px";
+    if(options.expanded) {
+        // If expanded, adjust font sizes
+        labelFontSize = "18px";
+        titleFontSize = "32px";
+        tooltipFontSize = "14px";
+    }
     // Select and clear SVG
     const svg = d3.select(svg_id)
-        .attr("width", "100%")
-        .attr("height", "auto")
-        .attr("viewBox", "0 0 1000 1000")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("viewBox", `0 0 ${width} ${height}`)
         .attr("style", "max-width: 100%; height: auto; background-color:rgb(255, 255, 255)");
     svg.selectAll("*").remove();
 
@@ -290,7 +305,7 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
 
     tooltip.append("text")
     .attr("fill", "white")
-    .attr("font-size", "18px")
+    .attr("font-size", tooltipFontSize)
     .attr("x", 8)
     .attr("y", 24);
     
@@ -356,7 +371,7 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
         })
         .on("click", function(event, d) {
             if(d.data.key === "Other" && d.data._otherData && typeof onOtherClick === "function") {
-                onOtherClick(data, svg_id, title, cordX, cordY);
+                onOtherClick(data, svg_id, title);
             }
         })
         .transition()
@@ -386,7 +401,8 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
         var posA = arc.centroid(d); // centroid of arc
         var posB = outerArc.centroid(d); // just outside the arc
         var posC = outerArc.centroid(d); // label position
-        posC[0] = radius * 1.2 * (midAngle(d) < Math.PI ? 1 : -1); // align left/right
+        posC[0] = radius * 1.05 * (midAngle(d) < Math.PI ? 1 : -1); // align left/right
+        posC[0] = readjustX(posC[0], width); //readjust to make sure it fits
         return [posA, posB, posC];
     })
     .style("fill", "none")
@@ -402,10 +418,11 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
     .data(pieData)
     .enter()
     .append("text")
-    .attr("font-size", "25px")
+    .attr("font-size", labelFontSize)
     .attr("transform", function(d) {
         var pos = outerArc.centroid(d);
-        pos[0] = radius * 1.25 * (midAngle(d) < Math.PI ? 1 : -1);
+        pos[0] = radius * 1.07 * (midAngle(d) < Math.PI ? 1 : -1);
+        pos[0] = readjustX(pos[0], width);
         return "translate(" + pos + ")";
     })
     .attr("text-anchor", function(d) {
@@ -424,7 +441,7 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
         .attr("x", width / 2)         // Centered horizontally in the SVG
         .attr("y", margin / 2)        // A bit below the top (adjust as needed)
         .attr("text-anchor", "middle")
-        .attr("font-size", "32px")
+        .attr("font-size", titleFontSize)
         .attr("font-weight", "bold")
         .attr("fill", "#222")
         .text(title);
@@ -474,11 +491,9 @@ function countProportions(data, factor) {
  * with drag-to-pan enabled via D3 zoom (pan only, no zoom).
  * @param {Object} data - The result object from countProportions().
  * @param {string} svg_id - The id of the SVG element to render the chart in.
- * @param {string} cordX - The label for the X axis (e.g., "Qualification").
- * @param {string} cordY - The label for the Y axis (e.g., "Percentage (%)").
  * @param {string} title - The chart title.
  */
-function drawBarChart(data, svg_id, cordX, cordY, title) {
+function drawBarChart(data, svg_id, title) {
     // Prepare the labels and datasets
     var labels = data.map(d => d.key);
     var subgroups = ["Enrolled or Graduate", "Dropout"];
@@ -548,7 +563,7 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
         .attr("y", -margin.left + 50)
         .attr("x", -height / 2)
         .attr("text-anchor", "middle")
-        .attr("font-size", "13px")
+        .attr("font-size", labelFontSize)
         .text("Proportion of Students (%)");
 
     // X axis label
@@ -556,7 +571,7 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
         .attr("x", width / 2)
         .attr("y", height + margin.bottom - 40)
         .attr("text-anchor", "middle")
-        .attr("font-size", "13px")
+        .attr("font-size", labelFontSize)
         .text("Factor");
 
     // Title
