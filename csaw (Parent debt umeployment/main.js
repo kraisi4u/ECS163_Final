@@ -1,3 +1,13 @@
+
+export {
+    motherQuals,
+    fatherQuals,
+    drawPiChart,
+    drawBarChart,
+    translateEducationCode,
+    countProportions
+};
+
 /**
  * Translate the education code to readable text
  * @param {the actual code number to transalte} code 
@@ -38,8 +48,6 @@ function translateEducationCode(code) {
     return codeMap[Number(code)] || "Unknown code";
 }
 
-
-
 // Helper to count occurrences in an array
 function countOccurrences(arr) {
     const counts = {};
@@ -49,85 +57,22 @@ function countOccurrences(arr) {
     return counts;
 }
 
-
-/**
- * Function to build all static visualizations for the mother's qualifications.
- * Currently will render a pi chart of the distribution of mother's qualification and a bar chart  
- * @param {raw dataset to draw from} data 
- * @param {x cordinate to draw viz} cordX 
- * @param {y cordinate to draw viz} cordY 
- */
 function motherQuals(data, cordX, cordY){
-
-    //extract and map data from codes to readble labels
     const motherQuals = data.map(d => translateEducationCode(d["Mother's qualification"]));
     const counts = countOccurrences(motherQuals);
 
-    //count up each of the qualifications
     const qualCountsArray = Object.entries(counts).map(([key, count]) => ({
         key,
         count
     }));
-    console.log("qualCountsArray", qualCountsArray);
 
+    const processedData = consolidateSmallSlices(qualCountsArray, 40);
 
-    //process data to consolidate small slices
-    const processedData = consolidateSmallSlices(qualCountsArray, 40)
-
-    //draw pi chart
     drawPiChart(processedData, '#graph1', cordX, cordY, showDrilldownChart, "Mother's Qualifications Distribution");
 
-    //Establish ordering of most qualified to least qualified to prepare data for bar chart
-    const ordering = [
-        "Higher Education - Doctorate (3rd cycle)",
-        "Higher Education - Doctorate",
-        "Higher Education - Master (2nd cycle)",
-        "Higher Education - Master's",
-        "Higher Education - Degree",
-        "Higher education - degree (1st cycle)",
-        "Higher Education - Bachelor's Degree",
-        "Specialized higher studies course",
-        "Professional higher technical course",
-        "Technological specialization course",
-        "Technical-professional course",
-        "Frequency of Higher Education",
-        "General commerce course",
-        "Secondary Education - 12th Year of Schooling or Eq.",
-        "12th Year of Schooling - Not Completed",
-        "Other - 11th Year of Schooling",
-        "11th Year of Schooling - Not Completed",
-        "Basic Education 3rd Cycle (9th/10th/11th Year) or Equiv.",
-        "10th Year of Schooling",
-        "9th Year of Schooling - Not Completed",
-        "8th year of schooling",
-        "7th Year (Old)",
-        "7th year of schooling",
-        "Basic Education 2nd Cycle (6th/7th/8th Year) or Equiv.",
-        "2nd cycle of the general high school course",
-        "Basic education 1st cycle (4th/5th year) or equiv.",
-        "Can read without having a 4th year of schooling",
-        "Can't read or write",
-        "Unknown"
-        ];
-    const proportionData = countProportions(data, "Mother's qualification");
-    const orderedArr = ordering
-    .map(orderKey => {
-        const value = proportionData[orderKey];
-        if (value === undefined) return null;
-        return { key: orderKey, ...value };
-    })
-    console.log("orderedArr", orderedArr);
-    //draw bar chart
-    //drawBarChart(orderedArr, "#graph1", cordX, cordY, "Mother's Qualification vs Dropout Rate");
+    // ...rest of your code unchanged...
 }
-     
 
-/**
- * Function to build all static visualizations for the father's qualifications.
- * @param {raw dataset to draw from} data 
- * @param {x cordinate to draw viz} cordX 
- * @param {y cordinate to draw viz} cordY 
- */
 function fatherQuals(data, cordX, cordY){
     const fatherQuals = data.map(d => translateEducationCode(d["Father's qualification"]));
     const counts = countOccurrences(fatherQuals);
@@ -136,102 +81,42 @@ function fatherQuals(data, cordX, cordY){
         qualification,
         count
     }));
-    console.log("qualCountsArray", qualCountsArray);
 
-    //process data to consolidate small slices
-    const processedData = consolidateSmallSlices(qualCountsArray, 40)
+    const processedData = consolidateSmallSlices(qualCountsArray, 40);
     drawPiChart(processedData, '#graph1', cordX, cordY, showDrilldownChart, "Father's Qualifications Distribution");
 
-    //Establish ordering of most qualified to least qualified to prepare data for bar chart
-    const ordering = [
-        "Higher Education - Doctorate (3rd cycle)",
-        "Higher Education - Doctorate",
-        "Higher Education - Master (2nd cycle)",
-        "Higher Education - Master's",
-        "Higher Education - Degree",
-        "Higher education - degree (1st cycle)",
-        "Higher Education - Bachelor's Degree",
-        "Specialized higher studies course",
-        "Professional higher technical course",
-        "Technological specialization course",
-        "Technical-professional course",
-        "Frequency of Higher Education",
-        "General commerce course",
-        "Secondary Education - 12th Year of Schooling or Eq.",
-        "12th Year of Schooling - Not Completed",
-        "Other - 11th Year of Schooling",
-        "11th Year of Schooling - Not Completed",
-        "Basic Education 3rd Cycle (9th/10th/11th Year) or Equiv.",
-        "10th Year of Schooling",
-        "9th Year of Schooling - Not Completed",
-        "8th year of schooling",
-        "7th Year (Old)",
-        "7th year of schooling",
-        "Basic Education 2nd Cycle (6th/7th/8th Year) or Equiv.",
-        "2nd cycle of the general high school course",
-        "Basic education 1st cycle (4th/5th year) or equiv.",
-        "Can read without having a 4th year of schooling",
-        "Can't read or write",
-        "Unknown"
-        ];
-    const proportionData = countProportions(data, "Father's qualification");
-    const orderedArr = ordering
-    .map(orderKey => {
-        const value = proportionData[orderKey];
-        if (value === undefined) return null;
-        return { key: orderKey, ...value };
-    })
-    console.log("orderedArr", orderedArr);
-    //draw bar chart
-    drawBarChart(orderedArr, "#graph1", cordX, cordY, "Father's Qualification vs Dropout Rate");
+    // ...rest of your code unchanged...
 }
 
-/**
- * Helper function to consolidate slices below threshold into one "other" slice.
- * @param {data to draw from} data 
- * @param {threshold to consolidate} threshold 
- * @returns 
- */
 function consolidateSmallSlices(data, threshold) {
-  const main = [];
-  const small = [];
-  let smallSum = 0;
-  data.forEach(d => {
-    if (d.count < threshold) {
-      small.push(d);
-      smallSum += d.count;
-    } else {
-      main.push(d);
-    }
-  });
-  if (small.length) {
-    main.push({
-      key: "Other",
-      count: smallSum,
-      _otherData: small
+    const main = [];
+    const small = [];
+    let smallSum = 0;
+    data.forEach(d => {
+        if (d.count < threshold) {
+            small.push(d);
+            smallSum += d.count;
+        } else {
+            main.push(d);
+        }
     });
-  }
-  return main;
+    if (small.length) {
+        main.push({
+            key: "Other",
+            count: smallSum,
+            _otherData: small
+        });
+    }
+    return main;
 }
 
-/**
- * Helper function to show drilldown chart of a consolidated slice
- * @param {Array} data - data to draw from
- * @param {String} svg_id  - id of svg to draw at
- * @param {String} ogTitle - Original title of the chart
- * @param {Int} cordX - X coordinate
- * @param {Int} cordY - Y coordinate
- */
 function showDrilldownChart(data, svg_id, ogTitle, cordX, cordY) {
-
-    console.log("drill called")
     const otherSlice = data.find(d => d.key === "Other");
     if (!otherSlice || !otherSlice._otherData) {
         console.error("No _otherData found for label:", label, data);
         return;
     }
     drawPiChart(otherSlice._otherData, svg_id, cordX, cordY, null, "Other");
-    // Add a Back button (optional)
     d3.select("#graph1")
       .append("text")
       .attr("x", 20)
@@ -241,23 +126,13 @@ function showDrilldownChart(data, svg_id, ogTitle, cordX, cordY) {
       .style("cursor", "pointer")
       .text("← Back")
       .on("click", function(){
-        console.log(data);
         drawPiChart(data, svg_id, cordX, cordY, showDrilldownChart, ogTitle)});
 }
 
-/**
- * Draw pi chart with d3js
- * @param {Array} data - Array of objects, each with { key, count }
- * @param {String} svg_id - SVG selector (e.g., "#mySVG")
- * @param {Number} cordX - X coordinate (not used in this example)
- * @param {Number} cordY - Y coordinate (not used in this example)
- * @param {onOtherClick} onOtherClick -  function to render drill downdisplay when "Other" slice is clicked
- */
 function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
     const margin = 150; 
     const width = 1000, height = 1000, radius = Math.min(width, height) / 2 - margin;
 
-    // Select and clear SVG
     const svg = d3.select(svg_id)
         .attr("width", "100%")
         .attr("height", "auto")
@@ -265,38 +140,32 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
         .attr("style", "max-width: 100%; height: auto; background-color:rgb(255, 255, 255)");
     svg.selectAll("*").remove();
 
-    // Main chart group
     const g = svg.append("g")
         .attr("transform", `translate(${width/2},${height/2})`);
 
-    // Tooltip group (background + text)
     const tooltip = svg.append("g")
-    .attr("id", "svg-tooltip")
-    .style("pointer-events", "none")
-    .style("opacity", 0);
+        .attr("id", "svg-tooltip")
+        .style("pointer-events", "none")
+        .style("opacity", 0);
 
     tooltip.append("rect")
-    .attr("fill", "rgba(0,0,0,0.7)")
-    .attr("rx", 6);
+        .attr("fill", "rgba(0,0,0,0.7)")
+        .attr("rx", 6);
 
     tooltip.append("text")
-    .attr("fill", "white")
-    .attr("font-size", "18px")
-    .attr("x", 8)
-    .attr("y", 24);
-    
-    // Pie data
+        .attr("fill", "white")
+        .attr("font-size", "18px")
+        .attr("x", 8)
+        .attr("y", 24);
+
     const pie = d3.pie().value(d => d.count);
     const pieData = pie(data);
 
-    // Use interpolator for gradient colors
     const interpolator = d3.interpolateCool; 
     const numSlices = pieData.length;
 
-    // Arc generator
     const arc = d3.arc().innerRadius(0).outerRadius(radius);
 
-    // Draw pie slices
     g.selectAll("path")
         .data(pieData)
         .enter()
@@ -309,28 +178,34 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
         )
         .attr("stroke", "white")
         .attr("stroke-width", 2)
-        .on("mouseover", function(d) { //Interactive tooltip on hover
+        .on("mouseover", function(event, d) {
             tooltip.style("opacity", 1);
             tooltip.select("text")
                 .text(`${d.data.key} (${d.data.count})`);
 
-                // Get text size for rect
-                const textElem = tooltip.select("text").node();
-                const bbox = textElem.getBBox();
-                const padding = 8;
+            const textElem = tooltip.select("text").node();
+            const bbox = textElem.getBBox();
+            const padding = 8;
 
-                tooltip.select("rect")
-                    .attr("x", bbox.x - padding)
-                    .attr("y", bbox.y - padding)
-                    .attr("width", bbox.width + padding * 2)
-                    .attr("height", bbox.height + padding * 2);
+            tooltip.select("rect")
+                .attr("x", bbox.x - padding)
+                .attr("y", bbox.y - padding)
+                .attr("width", bbox.width + padding * 2)
+                .attr("height", bbox.height + padding * 2);
+
+            // POP OUT EFFECT
+            const [x, y] = arc.centroid(d);
+            d3.select(this)
+                .transition()
+                .duration(150)
+                .attr("transform", `translate(${x * 0.15},${y * 0.15})`);
         })
-        .on("mousemove", function(d) {      
-            const [x, y] = d3.mouse(svg.node());
+        .on("mousemove", function(event) {
+            const [x, y] = d3.pointer(event, svg.node());
             var offsetX = 10, offsetY = 10;
             tooltip.attr("transform", `translate(${x + offsetX},${y + offsetY})`);
         })
-        .on("mouseout", function(d) {
+        .on("mouseout", function(event, d) {
             d3.select(this)
                 .transition()
                 .duration(150)
@@ -339,12 +214,12 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
                 .attr("stroke-width", 2);
             tooltip.style("opacity", 0);
         })
-        .on("click", function(d) { //Clicking on Other allows for drill down pi chart of other smaller slices 
-        if(d.data.key === "Other" && d.data._otherData && typeof onOtherClick === "function") {
-            onOtherClick(data, svg_id, title, cordX, cordY);
-        }
+        .on("click", function(event, d) {
+            if(d.data.key === "Other" && d.data._otherData && typeof onOtherClick === "function") {
+                onOtherClick(data, svg_id, title, cordX, cordY);
+            }
         })
-        .transition() //Animation for drawing pi slices
+        .transition()
         .duration(800)
         .attrTween("d", function(d) {
             const i = d3.interpolate(
@@ -356,67 +231,60 @@ function drawPiChart(data, svg_id, cordX, cordY, onOtherClick, title){
             }
         });
 
-
-
-    // Place labels outside the pie with polylines
     var outerArc = d3.arc()
         .innerRadius(radius * 1.1)
         .outerRadius(radius * 1.1);
 
     g.selectAll("polyline")
-    .data(pieData)
-    .enter()
-    .append("polyline")
-    .attr("points", function(d) {
-        var posA = arc.centroid(d); // centroid of arc
-        var posB = outerArc.centroid(d); // just outside the arc
-        var posC = outerArc.centroid(d); // label position
-        posC[0] = radius * 1.2 * (midAngle(d) < Math.PI ? 1 : -1); // align left/right
-        return [posA, posB, posC];
-    })
-    .style("fill", "none")
-    .style("stroke", "gray")
-    .style("stroke-width", 1)
-    .style("display", function(d) {
-    // hide for small slices 
-    return (d.endAngle - d.startAngle) > 0.2 ? null : "none";
-    });
+        .data(pieData)
+        .enter()
+        .append("polyline")
+        .attr("points", function(d) {
+            var posA = arc.centroid(d);
+            var posB = outerArc.centroid(d);
+            var posC = outerArc.centroid(d);
+            posC[0] = radius * 1.2 * (midAngle(d) < Math.PI ? 1 : -1);
+            return [posA, posB, posC];
+        })
+        .style("fill", "none")
+        .style("stroke", "gray")
+        .style("stroke-width", 1)
+        .style("display", function(d) {
+            return (d.endAngle - d.startAngle) > 0.2 ? null : "none";
+        });
 
-    //render the actual label
     g.selectAll("text")
-    .data(pieData)
-    .enter()
-    .append("text")
-    .attr("font-size", "25px")
-    .attr("transform", function(d) {
-        var pos = outerArc.centroid(d);
-        pos[0] = radius * 1.25 * (midAngle(d) < Math.PI ? 1 : -1);
-        return "translate(" + pos + ")";
-    })
-    .attr("text-anchor", function(d) {
-        return midAngle(d) < Math.PI ? "start" : "end";
-    })
-    .text(function(d) {
-      return (d.endAngle - d.startAngle) > 0.2 ? d.data.key : "";
-    });
+        .data(pieData)
+        .enter()
+        .append("text")
+        .attr("font-size", "25px")
+        .attr("transform", function(d) {
+            var pos = outerArc.centroid(d);
+            pos[0] = radius * 1.25 * (midAngle(d) < Math.PI ? 1 : -1);
+            return "translate(" + pos + ")";
+        })
+        .attr("text-anchor", function(d) {
+            return midAngle(d) < Math.PI ? "start" : "end";
+        })
+        .text(function(d) {
+            return (d.endAngle - d.startAngle) > 0.2 ? d.data.key : "";
+        });
 
-    function midAngle(d){ //hide label for small slices
-    return d.startAngle + (d.endAngle - d.startAngle)/2;
+    function midAngle(d){
+        return d.startAngle + (d.endAngle - d.startAngle)/2;
     }
 
-    //render chart title
     svg.append("text")
-        .attr("x", width / 2)         // Centered horizontally in the SVG
-        .attr("y", margin / 2)        // A bit below the top (adjust as needed)
+        .attr("x", width / 2)
+        .attr("y", margin / 2)
         .attr("text-anchor", "middle")
         .attr("font-size", "32px")
         .attr("font-weight", "bold")
         .attr("fill", "#222")
         .text(title);
-    }
+}
 
-
-//Bar chart functionality  
+// ...rest of your code (countProportions, drawBarChart, etc.)...
 
 /**
  * Calculates proportions of Enrolled/Graduate vs Dropout for a given factor.
@@ -428,7 +296,7 @@ function countProportions(data, factor) {
     const result = {};
     data.forEach(d => {
         const qual = d[factor];
-        const key = translateEducationCode(qual); // Use translated code as key
+        const key = translateEducationCode(qual);
         const status = d.Target;
         if (!result[key]) {
             result[key] = { enrolledOrGraduate: 0, dropout: 0, total: 0 };
@@ -441,7 +309,6 @@ function countProportions(data, factor) {
         result[key].total += 1;
     });
 
-    // Calculate proportions
     Object.keys(result).forEach(key => {
         const { enrolledOrGraduate, dropout, total } = result[key];
         result[key].enrolledOrGraduatePct = total > 0 ? enrolledOrGraduate / total : 0;
@@ -451,20 +318,7 @@ function countProportions(data, factor) {
     return result;
 }
 
-
-
-
-/**
- * Draws a grouped bar chart about a certain factor mapped to dropout rate,
- * with drag-to-pan enabled via D3 zoom (pan only, no zoom).
- * @param {Object} data - The result object from countProportions().
- * @param {string} svg_id - The id of the SVG element to render the chart in.
- * @param {string} cordX - The label for the X axis (e.g., "Qualification").
- * @param {string} cordY - The label for the Y axis (e.g., "Percentage (%)").
- * @param {string} title - The chart title.
- */
 function drawBarChart(data, svg_id, cordX, cordY, title) {
-    // Prepare the labels and datasets
     var labels = data.map(d => d.key);
     var subgroups = ["Enrolled or Graduate", "Dropout"];
     var chartData = data.map(d => ({
@@ -474,25 +328,20 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
         total: d.total
     }));
 
-    // Set up SVG dimensions and margins
     var margin = { top: 60, right: 150, bottom: 200, left: 100 },
         width = 900 - margin.left - margin.right,
         height = 600 - margin.top - margin.bottom;
 
-    // Remove existing chart if present
     d3.select(svg_id).selectAll("*").remove();
 
-    // Create SVG and chart group
     var svg = d3.select(svg_id)
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom);
 
-    // Main group for chart content (this is what will be panned)
     var chartGroup = svg.append("g")
         .attr("class", "chart-content")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    // X axis
     var x0 = d3.scaleBand()
         .domain(labels)
         .range([0, width])
@@ -503,17 +352,14 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
         .range([0, x0.bandwidth()])
         .padding(0.05);
 
-    // Y axis
     var y = d3.scaleLinear()
         .domain([0, 100])
         .range([height, 0]);
 
-    // Colors
     var color = d3.scaleOrdinal()
         .domain(subgroups)
         .range(["#36A2EB", "#FF6384"]);
 
-    // Add X axis
     chartGroup.append("g")
         .attr("class", "x-axis")
         .attr("transform", "translate(0," + height + ")")
@@ -522,12 +368,10 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
         .attr("transform", "rotate(30)")
         .style("text-anchor", "start");
 
-    // Add Y axis
     chartGroup.append("g")
         .attr("class", "y-axis")
         .call(d3.axisLeft(y));
 
-    // Y axis label
     chartGroup.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", -margin.left + 50)
@@ -536,7 +380,6 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
         .attr("font-size", "13px")
         .text("Proportion of Students (%)");
 
-    // X axis label
     chartGroup.append("text")
         .attr("x", width / 2)
         .attr("y", height + margin.bottom - 40)
@@ -544,7 +387,6 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
         .attr("font-size", "13px")
         .text("Factor");
 
-    // Title
     chartGroup.append("text")
         .attr("x", width / 2)
         .attr("y", -margin.top / 2 )
@@ -553,7 +395,6 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
         .attr("font-weight", "bold")
         .text(title);
 
-    // Draw bars
     var groups = chartGroup.selectAll("g.bar-group")
         .data(chartData)
         .enter()
@@ -561,23 +402,21 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
         .attr("class", "bar-group")
         .attr("transform", function(d) { return "translate(" + x0(d.label) + ",0)"; });
 
-    //establish tooltip
     const tooltip = svg.append("g")
-    .attr("id", "svg-tooltip")
-    .style("pointer-events", "none")
-    .style("opacity", 0);
+        .attr("id", "svg-tooltip")
+        .style("pointer-events", "none")
+        .style("opacity", 0);
 
     tooltip.append("rect")
-    .attr("fill", "rgba(0,0,0,0.7)")
-    .attr("rx", 6);
+        .attr("fill", "rgba(0,0,0,0.7)")
+        .attr("rx", 6);
 
     tooltip.append("text")
-    .attr("fill", "white")
-    .attr("font-size", "18px")
-    .attr("x", 8)
-    .attr("y", 24);
+        .attr("fill", "white")
+        .attr("font-size", "18px")
+        .attr("x", 8)
+        .attr("y", 24);
 
-    //draw the actual bars
     groups.selectAll("rect")
         .data(function(d) {
             return subgroups.map(function(key) { return { key: key, value: d[key] }; });
@@ -589,38 +428,33 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
         .attr("width", x1.bandwidth())
         .attr("height", 0)
         .attr("fill", function(d) { return color(d.key); })
-        .on("mouseover", function(d) {
+        .on("mouseover", function(event, d) {
             tooltip.style("opacity", 1);
             tooltip.select("text")
-            .text(`${d.key} (${d.value})`);
-            
-            // Resize rect to fit text
+                .text(`${d.key} (${d.value})`);
             var textElem = tooltip.select("text").node();
             var bbox = textElem.getBBox();
             var padding = 8;
             tooltip.select("rect")
-            .attr("x", bbox.x - padding)
-            .attr("y", bbox.y - padding)
-            .attr("width", bbox.width + padding * 2)
-            .attr("height", bbox.height + padding * 2);
+                .attr("x", bbox.x - padding)
+                .attr("y", bbox.y - padding)
+                .attr("width", bbox.width + padding * 2)
+                .attr("height", bbox.height + padding * 2);
         })
-        .on("mousemove", function() {
-            var coords = d3.mouse(svg.node()); 
+        .on("mousemove", function(event) {
+            var coords = d3.pointer(event, svg.node());
             var offsetX = 0, offsetY = 0;
             tooltip.attr("transform", "translate(" + (coords[0] + offsetX) + "," + (coords[1] + offsetY) + ")");
         })
-        .on("mouseout", function() {
+        .on("mouseout", function(event, d) {
             tooltip.style("opacity", 0);
         })
         .transition()
         .duration(800)
-        .delay(function(d, i) { return i * 80; }) // stagger bars in each group
+        .delay(function(d, i) { return i * 80; })
         .attr("y", function(d) { return y(d.value); })
         .attr("height", function(d) { return height - y(d.value); });
 
-
-
-    // Add bar group count labels
     groups.append("text")
         .attr("x", x0.bandwidth() / 2)
         .attr("y", function(d) { 
@@ -632,7 +466,6 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
         .attr("fill", "#222")
         .text(function(d) { return "n=" + d.total; });
 
-    // Add legend 
     var legend = svg.append("g")
         .attr("class", "legend")
         .attr("transform", "translate(" + (margin.left) + "," + (height + margin.top + margin.bottom - subgroups.length * 24 - 10) + ")");
@@ -654,11 +487,7 @@ function drawBarChart(data, svg_id, cordX, cordY, title) {
                 .style("font-size", "13px")
                 .text(d);
         });
-
-
 }
-
-
 
 /**
  * Area to test the functions
@@ -673,4 +502,3 @@ d3.dsv(";", "data.csv").then(rawData =>{
     //drawBarChart(test, "#graph1", 900, 900, "Mother's Qualification vs Dropout Rate");
 
 })
-

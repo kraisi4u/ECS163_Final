@@ -247,16 +247,7 @@ function showDrilldownChart(data, svg_id, ogTitle) {
         console.log(data);
         drawPiChart(data, svg_id, showDrilldownChart, ogTitle)});
 }
-/**
- * Helper function that readjusts label position based on the x coordinate.
- * @param {Int} x - x coordinate of the label
- * @param {Int} width - width of the chart
- * @param {Int} padding - padding to apply to the label
- * @returns 
- */
-function readjustX(x, width, padding = 110) {
-    return Math.max(-width/2 + padding, Math.min(width/2 - padding, x));
-}
+
 
 /**
  * Draw pi chart with d3js
@@ -269,7 +260,7 @@ function drawPiChart(data, svg_id, onOtherClick, title, options = {}) {
     //Set default sizes, intended for minimized viz
     const width = options.width || 350;
     const height = options.height || 350;
-    const margin = options.margin || 100;
+    const margin = options.margin || 80;
     const radius = Math.min(width, height) / 2 - margin;
 
     const labelFontSize = "5px";
@@ -402,7 +393,6 @@ function drawPiChart(data, svg_id, onOtherClick, title, options = {}) {
         var posB = outerArc.centroid(d); // just outside the arc
         var posC = outerArc.centroid(d); // label position
         posC[0] = radius * 1.05 * (midAngle(d) < Math.PI ? 1 : -1); // align left/right
-        posC[0] = readjustX(posC[0], width); //readjust to make sure it fits
         return [posA, posB, posC];
     })
     .style("fill", "none")
@@ -410,7 +400,8 @@ function drawPiChart(data, svg_id, onOtherClick, title, options = {}) {
     .style("stroke-width", 1)
     .style("display", function(d) {
     // hide for small slices 
-    return (d.endAngle - d.startAngle) > 0.2 ? null : "none";
+        if (!options.expanded) return "none";
+        return (d.endAngle - d.startAngle) > 0.2 ? null : "none";
     });
 
     //render the actual label
@@ -422,12 +413,12 @@ function drawPiChart(data, svg_id, onOtherClick, title, options = {}) {
     .attr("transform", function(d) {
         var pos = outerArc.centroid(d);
         pos[0] = radius * 1.07 * (midAngle(d) < Math.PI ? 1 : -1);
-        pos[0] = readjustX(pos[0], width);
         return "translate(" + pos + ")";
     })
     .attr("text-anchor", function(d) {
         return midAngle(d) < Math.PI ? "start" : "end";
     })
+    .style("display", options.expanded ? null : "none") //Hide labels if not expanded
     .text(function(d) {
       return (d.endAngle - d.startAngle) > 0.2 ? d.data.key : "";
     });
