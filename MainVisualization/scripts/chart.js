@@ -9,6 +9,17 @@ const MIN_VIEWPORT_HEIGHT = 400;
 const STROKE_COLOR = "black";
 const TEXT_COLOR = "white";
 
+// Used the catagorical 10 originally but was too low contrast
+// So used chatgpt to generate some higher contrast colors
+const COLOR_SCHEME = [
+    "#1f77b4", // Steel Blue
+    "#d62728", // Crimson Red
+    "#2ca02c", // Forest Green
+    "#ff7f0e", // Dark Orange
+    "#9467bd", // Purple
+    "#8c564b", // Brown
+];
+
 /**
  * makes nodes for a category
  * @param {string} category - category name
@@ -27,16 +38,7 @@ const makeNodes = (
     alternativeIndex = 0,
     totalAlternatives = 1
 ) => {
-    // Used the catagorical 10 originally but was too low contrast
-    // So used chatgpt to generate some higher contrast colors
-    const colorScheme = [
-        "#000000", // Black
-        "#FFFFFF", // White
-        "#FF0000", // Red
-        "#0000FF", // Blue
-        "#FFFF00", // Yellow
-        "#00FF00", // Lime
-    ];
+    const colorScheme = COLOR_SCHEME;
     const fontSize = 12;
 
     const colorScale = d3.scaleOrdinal(colorScheme).domain(values);
@@ -515,16 +517,7 @@ const drawFlows = (
         .append("g")
         .attr("class", "flow-link-group");
 
-    // Used the catagorical 10 originally but was too low contrast
-    // So used chatgpt to generate some higher contrast colors
-    const colorScheme = [
-        "#000000", // Black
-        "#FFFFFF", // White
-        "#FF0000", // Red
-        "#0000FF", // Blue
-        "#FFFF00", // Yellow
-        "#00FF00", // Lime
-    ];
+    const colorScheme = COLOR_SCHEME;
 
     const sourceColorScale = d3
         .scaleOrdinal(colorScheme)

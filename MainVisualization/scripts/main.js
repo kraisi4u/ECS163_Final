@@ -10,10 +10,7 @@ import {
     loadGradeData,
     getRawDataForTwoColumns,
 } from "./dataLoader.js";
-import {
-  motherQuals,
-  fatherQuals,
-} from './csawStatVis.js';
+import { motherQuals, fatherQuals } from "./csawStatVis.js";
 
 let currentSlide = 0;
 const slides = d3.selectAll(".slide");
@@ -86,7 +83,6 @@ const updateVerticalTitle = (htmlSlideIndex) => {
     titleElement.text(titleText).classed("visible", true);
 };
 
-
 /**
  * Define mapping of of chart targets to static viz functions
  * ADD MORE MAPPINGS HERE
@@ -109,54 +105,56 @@ const chartFunctions = {
  * @param {object} currentSlideElement the current slide element
  */
 const showStaticViz = (currentSlideElement) => {
-        // Get the active alternate and its chart target
-        const activeAlternate = getActiveAlternate(currentSlideElement);
-        const chartTarget = activeAlternate.attr("data-chart-target");
-        console.log("Chart target:", chartTarget);
-        //Handle static visualizations
-        const chartFunc = chartFunctions[chartTarget];
-        console.log("Chart function:", chartFunc);
-        if (chartFunc) {
-            //clear side chart
-            d3.select("#side-chart").selectAll("svg").remove();
+    // Get the active alternate and its chart target
+    const activeAlternate = getActiveAlternate(currentSlideElement);
+    const chartTarget = activeAlternate.attr("data-chart-target");
+    console.log("Chart target:", chartTarget);
+    //Handle static visualizations
+    const chartFunc = chartFunctions[chartTarget];
+    console.log("Chart function:", chartFunc);
+    if (chartFunc) {
+        //clear side chart
+        d3.select("#side-chart").selectAll("svg").remove();
 
-            // Add expand button
-            const sideChart = d3.select("#side-chart");
-            sideChart.append("button")
-                .attr("id", "expand-chart-btn")
-                .text("↗")
-                .style("font-size", "1em")
-                .style("background", "none")
-                .style("border", "none")
-                .style("padding", "2px 6px")
-                .style("cursor", "pointer")
-                .on("click", function() {
-                    // Show overlay
-                    d3.select("#chart-overlay").style("display", "flex");
-                    d3.select("#overlay-chart-container").selectAll("*").remove();
-                    const w = window.innerWidth;
-                    const h = window.innerHeight;
-                    // Draw expanded chart in overlay
-                    d3.select("#overlay-chart-container")
-                        .append("svg")
-                        .attr("id", "graph1-expanded")
-                        .attr("width", "100%")
-                        .attr("height", "100%")
-                        .attr("viewBox", `0 0 ${w} ${h}`);
-                    chartFunc(allCsvData, true);
-                });
-            //draw small vis in sied chart
-            d3.select("#side-chart")
-                .append("svg")
-                .attr("id", "graph1")
-                .attr("width", 350)
-                .attr("height", 350);
-            chartFunc(allCsvData);
-        };
-}
+        // Add expand button
+        const sideChart = d3.select("#side-chart");
+        sideChart
+            .append("button")
+            .attr("id", "expand-chart-btn")
+            .text("↗")
+            .style("font-size", "1em")
+            .style("font-size", "1em")
+            .style("background", "none")
+            .style("border", "none")
+            .style("padding", "2px 6px")
+            .style("cursor", "pointer")
+            .on("click", function () {
+                // Show overlay
+                d3.select("#chart-overlay").style("display", "flex");
+                d3.select("#overlay-chart-container").selectAll("*").remove();
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                // Draw expanded chart in overlay
+                d3.select("#overlay-chart-container")
+                    .append("svg")
+                    .attr("id", "graph1-expanded")
+                    .attr("width", "100%")
+                    .attr("height", "100%")
+                    .attr("viewBox", `0 0 ${w} ${h}`);
+                chartFunc(allCsvData, true);
+            });
+
+        d3.select("#side-chart")
+            .append("svg")
+            .attr("id", "graph1")
+            .attr("width", 350)
+            .attr("height", 350);
+        chartFunc(allCsvData);
+    }
+};
 
 // Logic to close overlay
-d3.select("#close-overlay-btn").on("click", function() {
+d3.select("#close-overlay-btn").on("click", function () {
     d3.select("#chart-overlay").style("display", "none");
     d3.select("#overlay-chart-container").selectAll("*").remove();
 });
@@ -179,7 +177,6 @@ const showSlide = (index) => {
         currentSlideElement.classed("with-chart", true);
         panToSlide(index);
         showStaticViz(currentSlideElement);
-
     } else {
         permanentChartArea.classed("visible", false);
         slides.classed("with-chart", false);
@@ -394,16 +391,53 @@ slides.each(function (d, htmlSlideIndex) {
     }
 });
 
+// The reason for the complicated navigation is we want a final slide
+// The final slide skips over the slide that just shows the outcomes
+// for a coherent story
+
+/**
+ * finds the slide index that contains the Target outcome chart
+ * @returns {number} index of outcome slide, or -1 if not found
+ */
+const findOutcomeSlideIndex = () => {
+    for (let i = 0; i < totalSlides; i++) {
+        const slideElement = getSlideElement(i);
+        const targetAlternate = slideElement.select(
+            '[data-chart-target="Target"]'
+        );
+        if (!targetAlternate.empty()) {
+            return i;
+        }
+    }
+    return -1;
+};
+
 // keyboard navigation
 // idk how to do scroll wheel
 // asked gpt and it generated something very complex
 // this works fine
 d3.select("body").on("keydown", (event) => {
+    const outcomeSlideIndex = findOutcomeSlideIndex();
+
     if (event.key === "ArrowRight" && currentSlide < totalSlides - 1) {
-        currentSlide++;
+        let nextSlide = currentSlide + 1;
+
+        // skip the outcome slide when going forward, go directly to final slide
+        if (nextSlide === outcomeSlideIndex && nextSlide < totalSlides - 1) {
+            nextSlide = nextSlide + 1;
+        }
+
+        currentSlide = nextSlide;
         showSlide(currentSlide);
     } else if (event.key === "ArrowLeft" && currentSlide > 0) {
-        currentSlide--;
+        let prevSlide = currentSlide - 1;
+
+        // skip the outcome slide when going backward too
+        if (prevSlide === outcomeSlideIndex && prevSlide > 0) {
+            prevSlide = prevSlide - 1;
+        }
+
+        currentSlide = prevSlide;
         showSlide(currentSlide);
     }
 });
