@@ -20,6 +20,10 @@ const COLOR_SCHEME = [
     "#8c564b", // Brown
 ];
 
+// global variable to track currently selected node
+// for the flow selection
+let selectedNode = null;
+
 /**
  * makes nodes for a category
  * @param {string} category - category name
@@ -97,6 +101,9 @@ const makeNodes = (
         fontSize
     );
     const nodeDetails = extractNodeDetails(createdNodes);
+
+    // Add background click handler for deselecting nodes
+    addBackgroundClickHandler();
 
     return {
         svg,
@@ -361,7 +368,12 @@ const renderNodes = (
         .enter()
         .append("g")
         .attr("class", "node")
-        .attr("transform", (d) => `translate(${centerX}, ${d.y})`);
+        .attr("transform", (d) => `translate(${centerX}, ${d.y})`)
+        .style("cursor", "pointer")
+        .on("click", (event, d) => {
+            event.stopPropagation();
+            handleNodeClick(d.value, event.currentTarget);
+        });
 
     //  create rectangles for nodes
     nodeGroups
@@ -672,9 +684,85 @@ const drawFlowPaths = (
                 .attr("stroke", sourceColor)
                 .attr("stroke-opacity", 0.6)
                 .attr("stroke-width", linkWidth)
-                .attr("fill", "none");
+                .attr("fill", "none")
+                .attr("data-source-node", sourceNodeLabel)
+                .attr("data-target-node", targetNodeLabel);
         });
     });
+};
+
+// handles node click events to filter flows
+// basically when you click a box it shows only flows from that box
+const handleNodeClick = (nodeValue, nodeElement) => {
+    const isCurrentlySelected = selectedNode === nodeValue;
+
+    // clear previous selection styling
+    d3.selectAll(".node").classed("selected", false);
+    d3.selectAll(".node rect").attr("stroke-width", 2);
+
+    if (isCurrentlySelected) {
+        // if clicking the same node, deselect and show all flows
+        selectedNode = null;
+        showAllFlows();
+    } else {
+        // select new node and filter flows
+        selectedNode = nodeValue;
+        d3.select(nodeElement).classed("selected", true);
+        d3.select(nodeElement).select("rect").attr("stroke-width", 4);
+        filterFlowsFromNode(nodeValue);
+    }
+};
+
+// filters flows to show only those originating from the specified node
+// uses the data attributes we store when creating flows
+const filterFlowsFromNode = (sourceNodeValue) => {
+    const flowLinkGroup = d3.select(".flow-link-group");
+    if (flowLinkGroup.empty()) return;
+
+    // get all flow paths
+    const allFlowPaths = flowLinkGroup.selectAll("path");
+
+    // hide all flows first
+    allFlowPaths.transition().duration(300).attr("stroke-opacity", 0.1);
+
+    // show only flows from the selected node using data attributes
+    // this is way more reliable than matching colors
+    allFlowPaths
+        .filter(function () {
+            return d3.select(this).attr("data-source-node") === sourceNodeValue;
+        })
+        .transition()
+        .duration(300)
+        .attr("stroke-opacity", 0.8);
+};
+
+// shows all flows with normal opacity
+// basically resets everything back to normal
+const showAllFlows = () => {
+    const flowLinkGroup = d3.select(".flow-link-group");
+    if (flowLinkGroup.empty()) return;
+
+    const allFlowPaths = flowLinkGroup.selectAll("path");
+
+    allFlowPaths.transition().duration(300).attr("stroke-opacity", 0.6);
+};
+
+// adds click handler to svg background to deselect nodes
+// so you can click empty space to clear selection
+const addBackgroundClickHandler = () => {
+    const svg = d3.select("#permanent-chart svg");
+    if (!svg.empty() && !svg.attr("data-background-handler")) {
+        svg.on("click", (event) => {
+            if (event.target === event.currentTarget) {
+                // clear selection
+                selectedNode = null;
+                d3.selectAll(".node").classed("selected", false);
+                d3.selectAll(".node rect").attr("stroke-width", 2);
+                showAllFlows();
+            }
+        });
+        svg.attr("data-background-handler", true);
+    }
 };
 
 export {
@@ -683,4 +771,7 @@ export {
     clearFlows,
     drawFlows,
     calculateChartDimensions,
+    handleNodeClick,
+    filterFlowsFromNode,
+    showAllFlows,
 };
