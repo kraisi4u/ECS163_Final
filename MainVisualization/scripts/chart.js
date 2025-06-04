@@ -27,7 +27,16 @@ const makeNodes = (
     alternativeIndex = 0,
     totalAlternatives = 1
 ) => {
-    const colorScheme = d3.schemeCategory10;
+    // Used the catagorical 10 originally but was too low contrast
+    // So used chatgpt to generate some higher contrast colors
+    const colorScheme = [
+        "#000000", // Black
+        "#FFFFFF", // White
+        "#FF0000", // Red
+        "#0000FF", // Blue
+        "#FFFF00", // Yellow
+        "#00FF00", // Lime
+    ];
     const fontSize = 12;
 
     const colorScale = d3.scaleOrdinal(colorScheme).domain(values);
@@ -394,6 +403,10 @@ const extractNodeDetails = (createdNodes) => {
     createdNodes.each(function (d) {
         const group = d3.select(this);
         const transform = group.attr("transform");
+        // Originally, since the col is dynamically transformed by the d3
+        // its not easy to find out how to draw the flows
+        // so instead chatgpt gave me this regex which can extract the transforms
+        // and match how to draw the flows
         const translateRegex = /translate\(([^,]+),([^)]+)\)/;
         const match = transform.match(translateRegex);
 
@@ -502,7 +515,17 @@ const drawFlows = (
         .append("g")
         .attr("class", "flow-link-group");
 
-    const colorScheme = d3.schemeCategory10;
+    // Used the catagorical 10 originally but was too low contrast
+    // So used chatgpt to generate some higher contrast colors
+    const colorScheme = [
+        "#000000", // Black
+        "#FFFFFF", // White
+        "#FF0000", // Red
+        "#0000FF", // Blue
+        "#FFFF00", // Yellow
+        "#00FF00", // Lime
+    ];
+
     const sourceColorScale = d3
         .scaleOrdinal(colorScheme)
         .domain(sourceNodes.map((node) => node.value));

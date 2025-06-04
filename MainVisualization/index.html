@@ -91,46 +91,48 @@
             }
 
             #side-chart {
-            position: absolute;
-            top: 150px;
-            right: 10px;
-            width: 350px;
-            height: 350px;
-            margin-right: 0px;
-            background: #f8f8f8;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-            padding: 12px;
-            z-index: 30;
+                position: absolute;
+                top: 150px;
+                right: 10px;
+                width: 350px;
+                height: 350px;
+                margin-right: 0px;
+                background: #f8f8f8;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+                padding: 12px;
+                z-index: 30;
             }
 
             #expand-chart-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            z-index: 10;
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                z-index: 10;
             }
 
-        #chart-overlay {
-        display: none;
-        position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        background: rgba(255,255,255,0.98);
-        z-index: 9999;
-        align-items: stretch;
-        justify-content: stretch;
-        }
+            #chart-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(255, 255, 255, 0.98);
+                z-index: 9999;
+                align-items: stretch;
+                justify-content: stretch;
+            }
 
-        #overlay-chart-container {
-        width: 100vw;
-        height: 100vh;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        align-items: stretch;
-        justify-content: stretch;
-        }
+            #overlay-chart-container {
+                width: 100vw;
+                height: 100vh;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                align-items: stretch;
+                justify-content: stretch;
+            }
 
             .permanent-chart-area.visible {
                 display: block;
@@ -179,7 +181,6 @@
     <body>
         <!--Basically a hack for our main chart, since that shouldn't be reinstianted on each slide, so its a permanent thing that gets hidden or shown-->
         <div class="permanent-chart-area" id="permanent-chart">
-             
             <div class="chart-title-vertical" id="chart-title-vertical"></div>
         </div>
 
@@ -322,19 +323,11 @@
             <div class="alternates">
                 <div
                     class="alternate active"
-                    data-chart-target="Application mode"
+                    data-chart-target="Scholarship holder"
                     data-chart-type="categorical"
                 >
-                    <h1>Application Mode</h1>
-                    <p>How students applied to the program</p>
-                </div>
-                <div
-                    class="alternate"
-                    data-chart-target="Application order"
-                    data-chart-type="categorical"
-                >
-                    <h1>Application Order</h1>
-                    <p>Order of application preference</p>
+                    <h1>Scholarship Status</h1>
+                    <p>Whether the student holds a scholarship</p>
                 </div>
                 <div class="switch-alternate-button">Switch to Alternative</div>
             </div>
@@ -393,20 +386,6 @@
                 >
                     <h1>Admission Grade</h1>
                     <p>Grade received for admission to the program</p>
-                </div>
-                <div class="switch-alternate-button">Switch to Alternative</div>
-            </div>
-        </div>
-
-        <div class="slide" data-has-chart="true">
-            <div class="alternates">
-                <div
-                    class="alternate active"
-                    data-chart-target="Scholarship holder"
-                    data-chart-type="categorical"
-                >
-                    <h1>Scholarship Status</h1>
-                    <p>Whether the student holds a scholarship</p>
                 </div>
                 <div class="switch-alternate-button">Switch to Alternative</div>
             </div>
@@ -566,7 +545,7 @@
             <div class="alternates">
                 <div
                     class="alternate active"
-                    data-chart-target="Target
+                    data-chart-target="Target"
                     data-chart-type="categorical"
                 >
                     <h1>Outcome</h1>
@@ -575,9 +554,33 @@
                 <div class="switch-alternate-button">Switch to Alternative</div>
             </div>
         </div>
-<div id="chart-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.98); z-index:9999; align-items:center; justify-content:center;">
-  <button id="close-overlay-btn" style="position:absolute; top:20px; right:30px; font-size:2em;">×</button>
-  <div id="overlay-chart-container"></div>
-</div>
+        <div
+            id="chart-overlay"
+            style="
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(255, 255, 255, 0.98);
+                z-index: 9999;
+                align-items: center;
+                justify-content: center;
+            "
+        >
+            <button
+                id="close-overlay-btn"
+                style="
+                    position: absolute;
+                    top: 20px;
+                    right: 30px;
+                    font-size: 2em;
+                "
+            >
+                ×
+            </button>
+            <div id="overlay-chart-container"></div>
+        </div>
     </body>
 </html>
