@@ -323,7 +323,7 @@ slides.each(function (d, htmlSlideIndex) {
             // when click button, shift the col up for alternates
             // also redraw flows
             //also redraw the static viz
-            
+            showStaticViz(slideElement);
             const chartColumnIndex = slidePositions[htmlSlideIndex];
             if (chartColumnIndex !== undefined) {
                 animateToAlternative(
