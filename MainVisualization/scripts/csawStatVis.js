@@ -62,9 +62,10 @@ function countOccurrences(arr) {
 /**
  * Function to build all static visualizations for the mother's qualifications.
  * Currently will render a pi chart of the distribution of mother's qualification and a bar chart  
- * @param {raw dataset to draw from} data 
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
  */
-function motherQuals(data){
+function motherQuals(data, expanded = false){
 
     //extract and map data from codes to readble labels
     const motherQuals = data.map(d => translateEducationCode(d["Mother's qualification"]));
@@ -81,8 +82,13 @@ function motherQuals(data){
     //process data to consolidate small slices
     const processedData = consolidateSmallSlices(qualCountsArray, 40)
 
+    if(expanded){
+        drawPiChart(processedData, '#graph1-expanded',showDrilldownChart, "Mother's Qualifications Distribution", expanded);
+    } else { //draw regular version
+       drawPiChart(processedData, '#graph1',showDrilldownChart, "Mother's Qualifications Distribution");
+    }
     //draw pi chart
-    drawPiChart(processedData, '#graph1',showDrilldownChart, "Mother's Qualifications Distribution");
+    
 
     //Establish ordering of most qualified to least qualified to prepare data for bar chart
     const ordering = [
@@ -137,8 +143,8 @@ function fatherQuals(data ){
     const fatherQuals = data.map(d => translateEducationCode(d["Father's qualification"]));
     const counts = countOccurrences(fatherQuals);
 
-    const qualCountsArray = Object.entries(counts).map(([qualification, count]) => ({
-        qualification,
+    const qualCountsArray = Object.entries(counts).map(([key, count]) => ({
+        key,
         count
     }));
     console.log("qualCountsArray", qualCountsArray);
@@ -225,17 +231,21 @@ function consolidateSmallSlices(data, threshold) {
  * @param {String} svg_id  - id of svg to draw at
  * @param {String} ogTitle - Original title of the chart
  */
-function showDrilldownChart(data, svg_id, ogTitle) {
+function showDrilldownChart(data, svg_id, ogTitle, expanded = false) {
 
     console.log("drill called")
     const otherSlice = data.find(d => d.key === "Other");
     if (!otherSlice || !otherSlice._otherData) {
-        console.error("No _otherData found for label:", label, data);
+        console.error("No _otherData found for label:Other", data);
         return;
     }
-    drawPiChart(otherSlice._otherData, svg_id, null, "Other");
+    if(expanded) {
+        drawPiChart(otherSlice._otherData, svg_id, null, "Other", expanded);
+    } else {
+        drawPiChart(otherSlice._otherData, svg_id, null, "Other");
+    }
     // Add a Back button (optional)
-    d3.select("#graph1")
+    d3.select(svg_id)
       .append("text")
       .attr("x", 20)
       .attr("y", 30)
@@ -245,7 +255,12 @@ function showDrilldownChart(data, svg_id, ogTitle) {
       .text("← Back")
       .on("click", function(){
         console.log(data);
-        drawPiChart(data, svg_id, showDrilldownChart, ogTitle)});
+        if(expanded) {
+            drawPiChart(data, svg_id, showDrilldownChart, ogTitle, expanded);
+        }else{
+             drawPiChart(data, svg_id, showDrilldownChart, ogTitle)
+        }
+       });
 }
 
 
@@ -254,23 +269,30 @@ function showDrilldownChart(data, svg_id, ogTitle) {
  * @param {Array} data - Array of objects, each with { key, count }
  * @param {String} svg_id - SVG to Render the chart in, e.g. "#graph1"
  * @param {onOtherClick} onOtherClick -  function to render drill downdisplay when "Other" slice is clicked
- * @param {object} options - Options for the chart, e.g. { width: 300, height: 300, margin: 60 } For use in expanded version of chart
+ * @param {String} title - Title of the chart
+ * @param {Boolean} expanded - check to see which version to render
  */
-function drawPiChart(data, svg_id, onOtherClick, title, options = {}) {
+function drawPiChart(data, svg_id, onOtherClick, title, expanded = false) {
     //Set default sizes, intended for minimized viz
-    const width = options.width || 350;
-    const height = options.height || 350;
-    const margin = options.margin || 80;
-    const radius = Math.min(width, height) / 2 - margin;
+    let width =  350;
+    let height =  350;
+    let margin = 80;
+    let radius = Math.min(width, height) / 2 - margin;
 
-    const labelFontSize = "5px";
-    const titleFontSize = "14px";
-    const tooltipFontSize = "6px";
-    if(options.expanded) {
+    let labelFontSize = "5px";
+    let titleFontSize = "14px";
+    let tooltipFontSize = "6px";
+    if(expanded) {
+        console.log("expanded version of chart");
         // If expanded, adjust font sizes
         labelFontSize = "18px";
         titleFontSize = "32px";
         tooltipFontSize = "14px";
+        //adjust chart sizes
+        width =  1800;
+        height =  600;
+        margin = 120;
+        radius = Math.min(width, height) / 2 - margin;
     }
     // Select and clear SVG
     const svg = d3.select(svg_id)
@@ -362,7 +384,11 @@ function drawPiChart(data, svg_id, onOtherClick, title, options = {}) {
         })
         .on("click", function(event, d) {
             if(d.data.key === "Other" && d.data._otherData && typeof onOtherClick === "function") {
+                if(expanded) {
+                    onOtherClick(data, svg_id, title, expanded);
+                } else {
                 onOtherClick(data, svg_id, title);
+                }
             }
         })
         .transition()
@@ -400,7 +426,7 @@ function drawPiChart(data, svg_id, onOtherClick, title, options = {}) {
     .style("stroke-width", 1)
     .style("display", function(d) {
     // hide for small slices 
-        if (!options.expanded) return "none";
+        if (!expanded) return "none";
         return (d.endAngle - d.startAngle) > 0.2 ? null : "none";
     });
 
@@ -418,7 +444,7 @@ function drawPiChart(data, svg_id, onOtherClick, title, options = {}) {
     .attr("text-anchor", function(d) {
         return midAngle(d) < Math.PI ? "start" : "end";
     })
-    .style("display", options.expanded ? null : "none") //Hide labels if not expanded
+    .style("display", expanded ? null : "none") //Hide labels if not expanded
     .text(function(d) {
       return (d.endAngle - d.startAngle) > 0.2 ? d.data.key : "";
     });

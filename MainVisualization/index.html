@@ -104,6 +104,34 @@
             z-index: 30;
             }
 
+            #expand-chart-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 10;
+            }
+
+        #chart-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(255,255,255,0.98);
+        z-index: 9999;
+        align-items: stretch;
+        justify-content: stretch;
+        }
+
+        #overlay-chart-container {
+        width: 100vw;
+        height: 100vh;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: stretch;
+        justify-content: stretch;
+        }
+
             .permanent-chart-area.visible {
                 display: block;
             }
@@ -547,5 +575,9 @@
                 <div class="switch-alternate-button">Switch to Alternative</div>
             </div>
         </div>
+<div id="chart-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.98); z-index:9999; align-items:center; justify-content:center;">
+  <button id="close-overlay-btn" style="position:absolute; top:20px; right:30px; font-size:2em;">×</button>
+  <div id="overlay-chart-container"></div>
+</div>
     </body>
 </html>

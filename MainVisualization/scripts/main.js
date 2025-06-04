@@ -90,6 +90,12 @@ const updateVerticalTitle = (htmlSlideIndex) => {
 /**
  * Define mapping of of chart targets to static viz functions
  * ADD MORE MAPPINGS HERE
+ *  IMPORTANT!!! TO DO TO MAKE SURE YOUR VIZ IS DRAWN RIGHT
+ * PLEASE ENSURE THAT YOU ARE DDRAWING TO #graph1 FOR THE SMALL STATIC VIZ AND
+ * #graph1-expanded FOR THE EXPANDED VIZ
+ * ALSO YOUR VIZ FUNCTION NEESD TO ACCEPT ONLY TWO PARAMETERS: DATA AND A EXPANEDD BOOL
+ * IF NECCESARY YOU SHOULD MAKE A SHELL HELPER FUNCTION THAT HANDLES THE DATA AND EXPANDED BOOL TO DDRAW
+ * THE CORRECT RESPECTIVE VIZ
  */
 const chartFunctions = {
     "Mother's qualification": motherQuals,
@@ -113,6 +119,34 @@ const showStaticViz = (currentSlideElement) => {
         if (chartFunc) {
             //clear side chart
             d3.select("#side-chart").selectAll("svg").remove();
+
+            // Add expand button
+            const sideChart = d3.select("#side-chart");
+            sideChart.append("button")
+                .attr("id", "expand-chart-btn")
+                .text("↗")
+                .style("font-size", "1em")
+                .style("font-size", "1em")
+                .style("background", "none")
+                .style("border", "none")
+                .style("padding", "2px 6px")
+                .style("cursor", "pointer")
+                .on("click", function() {
+                    // Show overlay
+                    d3.select("#chart-overlay").style("display", "flex");
+                    d3.select("#overlay-chart-container").selectAll("*").remove();
+                    const w = window.innerWidth;
+                    const h = window.innerHeight;
+                    // Draw expanded chart in overlay
+                    d3.select("#overlay-chart-container")
+                        .append("svg")
+                        .attr("id", "graph1-expanded")
+                        .attr("width", "100%")
+                        .attr("height", "100%")
+                        .attr("viewBox", `0 0 ${w} ${h}`);
+                    chartFunc(allCsvData, true);
+                });
+
             d3.select("#side-chart")
                 .append("svg")
                 .attr("id", "graph1")
@@ -121,6 +155,13 @@ const showStaticViz = (currentSlideElement) => {
             chartFunc(allCsvData);
         };
 }
+
+// Logic to close overlay
+d3.select("#close-overlay-btn").on("click", function() {
+    d3.select("#chart-overlay").style("display", "none");
+    d3.select("#overlay-chart-container").selectAll("*").remove();
+});
+
 /**
  * shows specific slide and handles chart visibility
  */
