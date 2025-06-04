@@ -97,7 +97,30 @@ const chartFunctions = {
     // Add more mappings as needed
 };
 
-
+/**
+ * Draws corresponding static visualization to current slide
+ * @param {string} chartTarget the target of the chart
+ * @param {object} currentSlideElement the current slide element
+ */
+const showStaticViz = (currentSlideElement) => {
+        // Get the active alternate and its chart target
+        const activeAlternate = getActiveAlternate(currentSlideElement);
+        const chartTarget = activeAlternate.attr("data-chart-target");
+        console.log("Chart target:", chartTarget);
+        //Handle static visualizations
+        const chartFunc = chartFunctions[chartTarget];
+        console.log("Chart function:", chartFunc);
+        if (chartFunc) {
+            //clear side chart
+            d3.select("#side-chart").selectAll("svg").remove();
+            d3.select("#side-chart")
+                .append("svg")
+                .attr("id", "graph1")
+                .attr("width", 350)
+                .attr("height", 350);
+            chartFunc(allCsvData);
+        };
+}
 /**
  * shows specific slide and handles chart visibility
  */
@@ -115,24 +138,7 @@ const showSlide = (index) => {
         permanentChartArea.classed("visible", true);
         currentSlideElement.classed("with-chart", true);
         panToSlide(index);
-
-        // Get the active alternate and its chart target
-        const activeAlternate = getActiveAlternate(currentSlideElement);
-        const chartTarget = activeAlternate.attr("data-chart-target");
-        console.log("Chart target:", chartTarget);
-        //Handle static visualizations
-        const chartFunc = chartFunctions[chartTarget];
-        console.log("Chart function:", chartFunc);
-        if (chartFunc) {
-            //clear side chart
-            d3.select("#side-chart").selectAll("svg").remove();
-            d3.select("#side-chart")
-                .append("svg")
-                .attr("id", "graph1")
-                .attr("width", 350)
-                .attr("height", 350);
-            chartFunc(allCsvData);
-        } 
+        showStaticViz(currentSlideElement);
 
     } else {
         permanentChartArea.classed("visible", false);
@@ -316,6 +322,8 @@ slides.each(function (d, htmlSlideIndex) {
 
             // when click button, shift the col up for alternates
             // also redraw flows
+            //also redraw the static viz
+            
             const chartColumnIndex = slidePositions[htmlSlideIndex];
             if (chartColumnIndex !== undefined) {
                 animateToAlternative(
