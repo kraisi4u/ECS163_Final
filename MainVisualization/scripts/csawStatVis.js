@@ -58,7 +58,8 @@ function countOccurrences(arr) {
     return counts;
 }
 
-
+//declare global variable to hold what chart to show
+let motherQualsChartType = "pie";
 /**
  * Function to build all static visualizations for the mother's qualifications.
  * Currently will render a pi chart of the distribution of mother's qualification and a bar chart  
@@ -66,6 +67,12 @@ function countOccurrences(arr) {
  * @param {boolean} expanded - whether to render the expanded version of the chart
  */
 function motherQuals(data, expanded = false){
+
+    // Set container and svg_id based on expanded
+    const container = expanded ? "#overlay-chart-container" : "#side-chart";
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    //Process data 
 
     //extract and map data from codes to readble labels
     const motherQuals = data.map(d => translateEducationCode(d["Mother's qualification"]));
@@ -81,14 +88,6 @@ function motherQuals(data, expanded = false){
 
     //process data to consolidate small slices
     const processedData = consolidateSmallSlices(qualCountsArray, 40)
-
-    if(expanded){
-        drawPiChart(processedData, '#graph1-expanded',showDrilldownChart, "Mother's Qualifications Distribution", expanded);
-    } else { //draw regular version
-       drawPiChart(processedData, '#graph1',showDrilldownChart, "Mother's Qualifications Distribution");
-    }
-    //draw pi chart
-    
 
     //Establish ordering of most qualified to least qualified to prepare data for bar chart
     const ordering = [
@@ -130,6 +129,48 @@ function motherQuals(data, expanded = false){
         return { key: orderKey, ...value };
     })
     console.log("orderedArr", orderedArr);
+
+    // Draw chart and swap button
+    function render() {
+        d3.select(container).selectAll("svg").remove();
+        d3.select(container).selectAll("#pie-btn, #bar-btn").remove();
+        // Buttons
+        d3.select(container)
+            .append("button")
+            .attr("id", "pie-btn")
+            .text("1")
+            .style("margin-right", "8px")
+            .on("click", () => { motherQualsChartType = "pie"; render(); });
+
+        d3.select(container)
+            .append("button")
+            .attr("id", "bar-btn")
+            .text("2")
+            .on("click", () => { motherQualsChartType = "bar"; render(); });
+
+        // Ensure SVG exists before drawing
+        if (d3.select(container).select(svg_id).empty()) {
+            d3.select(container)
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+}
+
+
+        // Chart
+        if (motherQualsChartType === "pie") {
+            console.log("drawing pie chart");
+            drawPiChart(processedData, svg_id, showDrilldownChart, "Mother's Qualifications Distribution", expanded);
+        } else {
+            drawBarChart(orderedArr, svg_id, "Mother's Qualification vs Dropout Rate", expanded);
+        }
+    }
+
+    render();
+
+    
+    
+
+    
     //draw bar chart
     //drawBarChart(orderedArr, "#graph1", cordX, cordY, "Mother's Qualification vs Dropout Rate");
 }
@@ -139,7 +180,7 @@ function motherQuals(data, expanded = false){
  * Function to build all static visualizations for the father's qualifications.
  * @param data {csv object} raw dataset to draw from
  */
-function fatherQuals(data ){
+function fatherQuals(data, expanded = false){
     const fatherQuals = data.map(d => translateEducationCode(d["Father's qualification"]));
     const counts = countOccurrences(fatherQuals);
 
@@ -151,7 +192,13 @@ function fatherQuals(data ){
 
     //process data to consolidate small slices
     const processedData = consolidateSmallSlices(qualCountsArray, 40)
-    drawPiChart(processedData, '#graph1', showDrilldownChart, "Father's Qualifications Distribution");
+
+     if(expanded){
+        drawPiChart(processedData, '#graph1-expanded',showDrilldownChart, "Father's Qualifications Distribution", expanded);
+    } else { //draw regular version
+       drawPiChart(processedData, '#graph1',showDrilldownChart, "Father's Qualifications Distribution");
+    }
+    
 
     //Establish ordering of most qualified to least qualified to prepare data for bar chart
     const ordering = [
@@ -476,8 +523,12 @@ function drawPiChart(data, svg_id, onOtherClick, title, expanded = false) {
 function countProportions(data, factor) {
     const result = {};
     data.forEach(d => {
-        const qual = d[factor];
-        const key = translateEducationCode(qual); // Use translated code as key
+        
+        let key = d[factor];
+        //translate key based on code
+        if(factor === "Mother's qualification"  || factor === "Father's qualification") {
+            key = translateEducationCode(key); // Use translated code as key
+        }
         const status = d.Target;
         if (!result[key]) {
             result[key] = { enrolledOrGraduate: 0, dropout: 0, total: 0 };
@@ -510,7 +561,21 @@ function countProportions(data, factor) {
  * @param {string} svg_id - The id of the SVG element to render the chart in.
  * @param {string} title - The chart title.
  */
-function drawBarChart(data, svg_id, title) {
+function drawBarChart(data, svg_id, title, expanded = false) {
+    // Set up SVG dimensions and margins based on expanded
+    let margin, width, height, labelFontSize;
+    if (expanded) {
+        margin = { top: 150, right: 200, bottom: 220, left: 180 };
+        width = 1800 - margin.left - margin.right;
+        height = 900 - margin.top - margin.bottom;
+        labelFontSize = "12px";
+    } else {
+        margin = { top: 200, right: 215, bottom: 250, left: 100 };
+        width = 900 - margin.left - margin.right;
+        height = 900 - margin.top - margin.bottom;
+        labelFontSize = "14px";
+    }
+
     // Prepare the labels and datasets
     var labels = data.map(d => d.key);
     var subgroups = ["Enrolled or Graduate", "Dropout"];
@@ -521,18 +586,15 @@ function drawBarChart(data, svg_id, title) {
         total: d.total
     }));
 
-    // Set up SVG dimensions and margins
-    var margin = { top: 60, right: 150, bottom: 200, left: 100 },
-        width = 900 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
-
     // Remove existing chart if present
     d3.select(svg_id).selectAll("*").remove();
 
     // Create SVG and chart group
     var svg = d3.select(svg_id)
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom);
+        .attr("height", height + margin.top + margin.bottom)
+        .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+        .attr("style", "max-width: 100%; height: auto; background-color:rgb(255, 255, 255)");
 
     // Main group for chart content (this is what will be panned)
     var chartGroup = svg.append("g")
@@ -567,12 +629,15 @@ function drawBarChart(data, svg_id, title) {
         .call(d3.axisBottom(x0))
         .selectAll("text")
         .attr("transform", "rotate(30)")
-        .style("text-anchor", "start");
+        .style("text-anchor", "start")
+        .attr("font-size", labelFontSize);
 
     // Add Y axis
     chartGroup.append("g")
         .attr("class", "y-axis")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y))
+        .selectAll("text")
+        .attr("font-size", labelFontSize);
 
     // Y axis label
     chartGroup.append("text")
@@ -581,6 +646,7 @@ function drawBarChart(data, svg_id, title) {
         .attr("x", -height / 2)
         .attr("text-anchor", "middle")
         .attr("font-size", labelFontSize)
+        .attr("font-weight", "bold")
         .text("Proportion of Students (%)");
 
     // X axis label
@@ -588,6 +654,7 @@ function drawBarChart(data, svg_id, title) {
         .attr("x", width / 2)
         .attr("y", height + margin.bottom - 40)
         .attr("text-anchor", "middle")
+        .attr("font-weight", "bold")
         .attr("font-size", labelFontSize)
         .text("Factor");
 
@@ -596,7 +663,7 @@ function drawBarChart(data, svg_id, title) {
         .attr("x", width / 2)
         .attr("y", -margin.top / 2 )
         .attr("text-anchor", "middle")
-        .attr("font-size", "18px")
+        .attr("font-size", expanded ? "36px" : "18px")
         .attr("font-weight", "bold")
         .text(title);
 
@@ -610,19 +677,19 @@ function drawBarChart(data, svg_id, title) {
 
     //establish tooltip
     const tooltip = svg.append("g")
-    .attr("id", "svg-tooltip")
-    .style("pointer-events", "none")
-    .style("opacity", 0);
+        .attr("id", "svg-tooltip")
+        .style("pointer-events", "none")
+        .style("opacity", 0);
 
     tooltip.append("rect")
-    .attr("fill", "rgba(0,0,0,0.7)")
-    .attr("rx", 6);
+        .attr("fill", "rgba(0,0,0,0.7)")
+        .attr("rx", 6);
 
     tooltip.append("text")
-    .attr("fill", "white")
-    .attr("font-size", "18px")
-    .attr("x", 8)
-    .attr("y", 24);
+        .attr("fill", "white")
+        .attr("font-size", expanded ? "28px" : "18px")
+        .attr("x", 8)
+        .attr("y", 24);
 
     //draw the actual bars
     groups.selectAll("rect")
@@ -636,36 +703,32 @@ function drawBarChart(data, svg_id, title) {
         .attr("width", x1.bandwidth())
         .attr("height", 0)
         .attr("fill", function(d) { return color(d.key); })
-        .on("mouseover", function(event, d) { // <-- add event
+        .on("mouseover", function(event, d) {
             tooltip.style("opacity", 1);
             tooltip.select("text")
-            .text(`${d.key} (${d.value})`);
-            
-            // Resize rect to fit text
+                .text(`${d.key} (${d.value.toFixed(1)}%)`);
             var textElem = tooltip.select("text").node();
             var bbox = textElem.getBBox();
             var padding = 8;
             tooltip.select("rect")
-            .attr("x", bbox.x - padding)
-            .attr("y", bbox.y - padding)
-            .attr("width", bbox.width + padding * 2)
-            .attr("height", bbox.height + padding * 2);
+                .attr("x", bbox.x - padding)
+                .attr("y", bbox.y - padding)
+                .attr("width", bbox.width + padding * 2)
+                .attr("height", bbox.height + padding * 2);
         })
-        .on("mousemove", function(event, d) { // <-- add event
+        .on("mousemove", function(event, d) {
             var coords = d3.pointer(event, svg.node());
             var offsetX = 0, offsetY = 0;
             tooltip.attr("transform", "translate(" + (coords[0] + offsetX) + "," + (coords[1] + offsetY) + ")");
         })
-        .on("mouseout", function(event, d) { // <-- add event
+        .on("mouseout", function(event, d) {
             tooltip.style("opacity", 0);
         })
         .transition()
         .duration(800)
-        .delay(function(d, i) { return i * 80; }) // stagger bars in each group
+        .delay(function(d, i) { return i * 80; })
         .attr("y", function(d) { return y(d.value); })
         .attr("height", function(d) { return height - y(d.value); });
-
-
 
     // Add bar group count labels
     groups.append("text")
@@ -675,34 +738,32 @@ function drawBarChart(data, svg_id, title) {
             return y(maxVal) - 10; 
         })
         .attr("text-anchor", "middle")
-        .attr("font-size", "12px")
+        .attr("font-size", expanded ? "22px" : "12px")
         .attr("fill", "#222")
         .text(function(d) { return "n=" + d.total; });
 
     // Add legend 
     var legend = svg.append("g")
         .attr("class", "legend")
-        .attr("transform", "translate(" + (margin.left) + "," + (height + margin.top + margin.bottom - subgroups.length * 24 - 10) + ")");
+        .attr("transform", "translate(" + (margin.left) + "," + (height + margin.top + margin.bottom - subgroups.length * 34 - 10) + ")");
 
     legend.selectAll("g")
         .data(subgroups)
         .enter().append("g")
-        .attr("transform", function(d, i) { return "translate(0," + (i * 24) + ")"; })
+        .attr("transform", function(d, i) { return "translate(0," + (i * (expanded ? 34 : 24)) + ")"; })
         .each(function(d, i) {
             d3.select(this).append("rect")
-                .attr("width", 18)
-                .attr("height", 18)
+                .attr("width", expanded ? 28 : 18)
+                .attr("height", expanded ? 28 : 18)
                 .attr("fill", color(d));
             d3.select(this).append("text")
-                .attr("x", 26)
-                .attr("y", 9)
+                .attr("x", expanded ? 36 : 26)
+                .attr("y", expanded ? 14 : 9)
                 .attr("dy", ".35em")
                 .style("text-anchor", "start")
-                .style("font-size", "13px")
+                .style("font-size", expanded ? "22px" : "13px")
                 .text(d);
         });
-
-
 }
 
 
