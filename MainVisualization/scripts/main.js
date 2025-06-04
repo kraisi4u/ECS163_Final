@@ -90,12 +90,13 @@ const updateVerticalTitle = (htmlSlideIndex) => {
 /**
  * Define mapping of of chart targets to static viz functions
  * ADD MORE MAPPINGS HERE
- *  IMPORTANT!!! TO DO TO MAKE SURE YOUR VIZ IS DRAWN RIGHT
- * PLEASE ENSURE THAT YOU ARE DDRAWING TO #graph1 FOR THE SMALL STATIC VIZ AND
+ * IMPORTANT!!! TO DO TO MAKE SURE YOUR VIZ IS DRAWN RIGHT
+ * PLEASE ENSURE THAT YOU ARE DRAWING TO #graph1 FOR THE SMALL STATIC VIZ AND
  * #graph1-expanded FOR THE EXPANDED VIZ
- * ALSO YOUR VIZ FUNCTION NEESD TO ACCEPT ONLY TWO PARAMETERS: DATA AND A EXPANEDD BOOL
+ * ALSO YOUR VIZ FUNCTION NEESD TO ACCEPT ONLY TWO PARAMETERS: DATA AND A EXPANED BOOL
  * IF NECCESARY YOU SHOULD MAKE A SHELL HELPER FUNCTION THAT HANDLES THE DATA AND EXPANDED BOOL TO DDRAW
  * THE CORRECT RESPECTIVE VIZ
+ * ALSO EXPORT AND IMPORT YOUR VIZ FUNCTIONS AS NEEDED TO BE ABLE TO ACCESS THEM HERE
  */
 const chartFunctions = {
     "Mother's qualification": motherQuals,
@@ -105,7 +106,6 @@ const chartFunctions = {
 
 /**
  * Draws corresponding static visualization to current slide
- * @param {string} chartTarget the target of the chart
  * @param {object} currentSlideElement the current slide element
  */
 const showStaticViz = (currentSlideElement) => {
@@ -126,7 +126,6 @@ const showStaticViz = (currentSlideElement) => {
                 .attr("id", "expand-chart-btn")
                 .text("↗")
                 .style("font-size", "1em")
-                .style("font-size", "1em")
                 .style("background", "none")
                 .style("border", "none")
                 .style("padding", "2px 6px")
@@ -146,7 +145,7 @@ const showStaticViz = (currentSlideElement) => {
                         .attr("viewBox", `0 0 ${w} ${h}`);
                     chartFunc(allCsvData, true);
                 });
-
+            //draw small vis in sied chart
             d3.select("#side-chart")
                 .append("svg")
                 .attr("id", "graph1")
