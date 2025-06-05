@@ -402,7 +402,6 @@ const renderNodes = (
             "font-size",
             (d) => `${Math.max(10, Math.min(fontSize, d.height * 0.35))}px`
         )
-        .style("font-family", "Arial, sans-serif")
         .style("fill", TEXT_COLOR)
         .style("font-weight", "500");
 

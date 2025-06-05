@@ -6,10 +6,15 @@
         <title>Life of a Student</title>
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script src="./scripts/main.js" defer type="module"></script>
+
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
+        </style>
         <style>
             body {
                 margin: 0;
                 padding: 0;
+                font-family: "Comic Neue";
                 position: relative;
                 overflow: hidden; /* Prevent page scrollbar */
             }
@@ -313,7 +318,7 @@
                     data-chart-type="categorical"
                 >
                     <h1>Age at Enrollment</h1>
-                    <p>Age when the student enrolled</p>
+                    <p>Age when the student enrolled in school</p>
                 </div>
                 <div
                     class="alternate"
@@ -363,13 +368,13 @@
                     data-chart-type="categorical"
                 >
                     <h1>Scholarship Status</h1>
-                    <p>Whether the student holds a scholarship</p>
+                    <p>Whether the student holds a scholarship.</p>
                 </div>
                 <div class="switch-alternate-button">Switch to Alternative</div>
             </div>
         </div>
 
-         <div class="slide" data-has-chart="true">
+        <div class="slide" data-has-chart="true">
             <div class="alternates">
                 <div
                     class="alternate active"
@@ -541,8 +546,6 @@
             </div>
         </div>
 
-       
-
         <div class="slide" data-has-chart="true">
             <div class="alternates">
                 <div
@@ -560,10 +563,13 @@
         <div class="slide">
             <div class="center title">
                 <h1>The End</h1>
-                <h2>The Journy of the student from beginning to end</h2>
-                <p>SOME TEXT IDK</p>
+                <h2>The Journey of the student from beginning to end</h2>
+                <p>
+                    All factors from financials, parents, jobs, and previous
+                    grades affect the overall conclusion.
+                </p>
                 <p style="margin-top: 40px; font-size: 1em; opacity: 0.8">
-                    Thank you for exploring.
+                    Thank you for following this journey.
                 </p>
             </div>
         </div>
