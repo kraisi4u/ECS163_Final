@@ -16,7 +16,8 @@ import { //functions to translate int codes to human readable labels
     qualificationShortLabels,
     translateJobCode,
     translateNationalityCode,
-    translateYesNo
+    translateYesNo,
+    translatePreviousQualification
 } from "./translations.js";
  
 
@@ -1039,6 +1040,89 @@ function debtorStatusBar(data, expanded = false, containerElement = null) {
     render();
 }
 
+/**
+ * Build the previous qualification static bar chart in designated container
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
+function previousQualificationBar(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Extract and map data (translate codes to readable strings)
+    const qualifications = data.map(d => translatePreviousQualification(d["Previous qualification"]));
+    const counts = countOccurrences(qualifications);
+
+    // Remap data with translated keys for countProportions
+    const translatedData = data.map(d => ({
+        ...d,
+        "Previous qualification": translatePreviousQualification(d["Previous qualification"])
+    }));
+    const proportionData = countProportions(translatedData, "Previous qualification");
+
+    // Order by most to least educated
+    const ordering = [
+        "Higher education - doctorate",
+        "Higher education - master's",
+        "Higher education - master (2nd cycle)",
+        "Higher education - degree",
+        "Higher education - degree (1st cycle)",
+        "Higher education - bachelor's degree",
+        "Professional higher technical course",
+        "Technological specialization course",
+        "Frequency of higher education",
+        "Secondary education",
+        "12th year of schooling - not completed",
+        "11th year of schooling - not completed",
+        "Other - 11th year of schooling",
+        "10th year of schooling",
+        "10th year of schooling - not completed",
+        "Basic education 3rd cycle (9th/10th/11th year) or equiv.",
+        "Basic education 2nd cycle (6th/7th/8th year) or equiv.",
+        "Other"
+    ].filter(label => counts[label] !== undefined);
+
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "Previous Qualification vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
+
 export {
     motherQuals,
     fatherQuals,
@@ -1049,5 +1133,6 @@ export {
     nationalityBar,
     internationalStatusBar,
     tuitionPaymentStatusBar,
-    debtorStatusBar
+    debtorStatusBar,
+    previousQualificationBar
 };

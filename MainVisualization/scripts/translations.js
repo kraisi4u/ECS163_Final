@@ -309,6 +309,34 @@ function translateYesNo(value) {
     return "Unknown";
 }
 
+
+/**
+ * Translate the previous qualification code to readable text
+ * @param {number|string} code - the code to translate
+ * @returns {string} - readable previous qualification
+ */
+function translatePreviousQualification(code) {
+    const codeMap = {
+        1: "Secondary education",
+        2: "Higher education - bachelor's degree",
+        3: "Higher education - degree",
+        4: "Higher education - master's",
+        5: "Higher education - doctorate",
+        6: "Frequency of higher education",
+        9: "12th year of schooling - not completed",
+        10: "11th year of schooling - not completed",
+        12: "Other - 11th year of schooling",
+        14: "10th year of schooling",
+        15: "10th year of schooling - not completed",
+        19: "Basic education 3rd cycle (9th/10th/11th year) or equiv.",
+        38: "Basic education 2nd cycle (6th/7th/8th year) or equiv.",
+        39: "Technological specialization course",
+        40: "Higher education - degree (1st cycle)",
+        42: "Professional higher technical course",
+        43: "Higher education - master (2nd cycle)"
+    };
+    return codeMap[Number(code)] || "Other";
+}
 export {
     translateEducationCode,
     translateFatherJobCode,
@@ -317,5 +345,6 @@ export {
     qualificationShortLabels,
     translateJobCode,
     translateNationalityCode,
-    translateYesNo
+    translateYesNo,
+    translatePreviousQualification
 };

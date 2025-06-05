@@ -20,6 +20,7 @@ import {
     internationalStatusBar,
     tuitionPaymentStatusBar,
     debtorStatusBar,
+    previousQualificationBar
 
 } from "./staticVizFunctions.js";
 
@@ -116,6 +117,7 @@ const chartFunctions = {
     "International": internationalStatusBar,
     "Tuition fees up to date": tuitionPaymentStatusBar,
     "Debtor": debtorStatusBar,
+    "Previous qualification": previousQualificationBar,
     // Add more mappings as needed
 };
 
