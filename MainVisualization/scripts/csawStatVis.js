@@ -163,10 +163,13 @@ function motherQuals(data, expanded = false, containerElement = null) {
             });
 
         // Ensure SVG exists before drawing
+        let svgElement;
         if (containerSelection.select(svg_id).empty()) {
-            containerSelection
+            svgElement = containerSelection
                 .append("svg")
                 .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
         }
 
         // Chart
@@ -174,7 +177,7 @@ function motherQuals(data, expanded = false, containerElement = null) {
             console.log("drawing pie chart");
             drawPiChart(
                 processedData,
-                svg_id,
+                svgElement,
                 showDrilldownChart,
                 "Mother's Qualifications Distribution",
                 expanded
@@ -182,7 +185,7 @@ function motherQuals(data, expanded = false, containerElement = null) {
         } else {
             drawBarChart(
                 orderedArr,
-                svg_id,
+                svgElement,
                 "Mother's Qualification vs Dropout Rate",
                 expanded
             );
@@ -295,10 +298,13 @@ function fatherQuals(data, expanded = false, containerElement = null) {
             });
 
         // Ensure SVG exists before drawing
+        let svgElement;
         if (containerSelection.select(svg_id).empty()) {
-            containerSelection
+            svgElement = containerSelection
                 .append("svg")
                 .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
         }
 
         // Chart
@@ -306,7 +312,7 @@ function fatherQuals(data, expanded = false, containerElement = null) {
             console.log("drawing pie chart");
             drawPiChart(
                 processedData,
-                svg_id,
+                svgElement,
                 showDrilldownChart,
                 "Father's Qualifications Distribution",
                 expanded
@@ -314,7 +320,7 @@ function fatherQuals(data, expanded = false, containerElement = null) {
         } else {
             drawBarChart(
                 orderedArr,
-                svg_id,
+                svgElement,
                 "Father's Qualification vs Dropout Rate",
                 expanded
             );
@@ -487,17 +493,20 @@ function motherJob(data, expanded = false, containerElement = null) {
             });
 
         // Ensure SVG exists before drawing
+        let svgElement;
         if (containerSelection.select(svg_id).empty()) {
-            containerSelection
+            svgElement = containerSelection
                 .append("svg")
                 .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
         }
 
         // Chart
         if (motherJobChartType === "pie") {
             drawPiChart(
                 processedData,
-                svg_id,
+                svgElement,
                 showDrilldownChart,
                 "Mother's Occupation Distribution",
                 expanded
@@ -506,7 +515,7 @@ function motherJob(data, expanded = false, containerElement = null) {
             console.log("drawing bar chart");
             drawBarChart(
                 orderedArr,
-                svg_id,
+                svgElement,
                 "Mother's Occupation vs Dropout Rate",
                 expanded
             );
@@ -590,12 +599,18 @@ function showDrilldownChart(data, svg_id, ogTitle, expanded = false) {
 /**
  * Draw pi chart with d3js
  * @param {Array} data - Array of objects, each with { key, count }
- * @param {String} svg_id - SVG to Render the chart in, e.g. "#graph1"
+ * @param {String} svg_id_or_element - SVG to Render the chart in, e.g. "#graph1" or d3 selection
  * @param {onOtherClick} onOtherClick -  function to render drill downdisplay when "Other" slice is clicked
  * @param {String} title - Title of the chart
  * @param {Boolean} expanded - check to see which version to render
  */
-function drawPiChart(data, svg_id, onOtherClick, title, expanded = false) {
+function drawPiChart(
+    data,
+    svg_id_or_element,
+    onOtherClick,
+    title,
+    expanded = false
+) {
     //Set default sizes, intended for minimized viz
     let width = 350;
     let height = 350;
@@ -617,17 +632,21 @@ function drawPiChart(data, svg_id, onOtherClick, title, expanded = false) {
         margin = 120;
         radius = Math.min(width, height) / 2 - margin;
     }
-    // Select and clear SVG
-    const svg = d3
-        .select(svg_id)
-        .attr("width", width)
+    // Remove existing chart if present - handle both string selectors and D3 selections
+    const svg =
+        typeof svg_id_or_element === "string"
+            ? d3.select(svg_id_or_element)
+            : svg_id_or_element;
+    svg.selectAll("*").remove();
+
+    // Set SVG attributes for pie chart
+    svg.attr("width", width)
         .attr("height", height)
         .attr("viewBox", `0 0 ${width} ${height}`)
         .attr(
             "style",
             "max-width: 100%; height: auto; background-color:rgb(255, 255, 255)"
         );
-    svg.selectAll("*").remove();
 
     // Main chart group
     const g = svg
@@ -721,9 +740,9 @@ function drawPiChart(data, svg_id, onOtherClick, title, expanded = false) {
                 typeof onOtherClick === "function"
             ) {
                 if (expanded) {
-                    onOtherClick(data, svg_id, title, expanded);
+                    onOtherClick(data, svg_id_or_element, title, expanded);
                 } else {
-                    onOtherClick(data, svg_id, title);
+                    onOtherClick(data, svg_id_or_element, title);
                 }
             }
         })
@@ -851,7 +870,7 @@ function countProportions(data, factor) {
  * @param {string} svg_id - The id of the SVG element to render the chart in.
  * @param {string} title - The chart title.
  */
-function drawBarChart(data, svg_id, title, expanded = false) {
+function drawBarChart(data, svg_id_or_element, title, expanded = false) {
     // Set up SVG dimensions and margins based on expanded
     let margin, width, height, labelFontSize;
     if (expanded) {
@@ -876,13 +895,15 @@ function drawBarChart(data, svg_id, title, expanded = false) {
         total: d.total,
     }));
 
-    // Remove existing chart if present
-    d3.select(svg_id).selectAll("*").remove();
+    // Remove existing chart if present - handle both string selectors and D3 selections
+    const svg =
+        typeof svg_id_or_element === "string"
+            ? d3.select(svg_id_or_element)
+            : svg_id_or_element;
+    svg.selectAll("*").remove();
 
     // Create SVG and chart group
-    var svg = d3
-        .select(svg_id)
-        .attr("width", width + margin.left + margin.right)
+    svg.attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .attr(
             "viewBox",
