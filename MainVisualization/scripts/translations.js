@@ -262,11 +262,60 @@ function translateJobCode(code) {
     return jobMap[Number(code)] || "Unknown code";
 }
 
+/**
+ * Translate the nationality code to readable text
+ * @param {number|string} code - the code to translate
+ * @returns {string} - readable nationality
+ */
+function translateNationalityCode(code) {
+    const codeMap = {
+        1: "Portuguese",
+        2: "German",
+        6: "Spanish",
+        11: "Italian",
+        13: "Dutch",
+        14: "English",
+        17: "Lithuanian",
+        21: "Angolan",
+        22: "Cape Verdean",
+        24: "Guinean",
+        25: "Mozambican",
+        26: "Santomean",
+        32: "Turkish",
+        41: "Brazilian",
+        62: "Romanian",
+        100: "Moldova (Republic of)",
+        101: "Mexican",
+        103: "Ukrainian",
+        105: "Russian",
+        108: "Cuban",
+        109: "Colombian"
+    };
+    return codeMap[Number(code)] || "Other";
+}
+
+/**
+ * Translate a yes/no code or value to readable text
+ * @param {string|number} value - the value to translate (e.g., "1", "0", 1, 0, "yes", "no", etc.)
+ * @returns {string} - "Yes", "No", or "Unknown"
+ */
+function translateYesNo(value) {
+    if (value === 1 || value === "1" || value === "yes" || value === "Yes" || value === "Y" || value === "y" || value === true) {
+        return "Yes";
+    }
+    if (value === 0 || value === "0" || value === "no" || value === "No" || value === "N" || value === "n" || value === false) {
+        return "No";
+    }
+    return "Unknown";
+}
+
 export {
     translateEducationCode,
     translateFatherJobCode,
     jobShortLabels,
     fatherJobShortLabels,
     qualificationShortLabels,
-    translateJobCode
+    translateJobCode,
+    translateNationalityCode,
+    translateYesNo
 };

@@ -3,18 +3,20 @@
  * associated data processing
  */
 
-import {     
+import {      //functions that actually draw the charts
     drawPiChart,
     drawBarChart,
     countProportions,    
     showDrilldownChart,
     consolidateSmallSlices } from "./chartGenFunctions.js";
-import {
+import { //functions to translate int codes to human readable labels
     translateEducationCode,
     jobShortLabels,
     fatherJobShortLabels,
     qualificationShortLabels,
-    translateJobCode
+    translateJobCode,
+    translateNationalityCode,
+    translateYesNo
 } from "./translations.js";
  
 
@@ -626,6 +628,11 @@ function fatherJob(data, expanded = false, containerElement = null) {
     render();
 }
 
+/**
+ * Generic Bar functions. Individual as 
+ * the function signature was already prededtermined so a generic general function
+ * would not work
+ */
 
 /**
  * Build the unemployment rate static vis in designated container
@@ -655,17 +662,13 @@ function unemploymentRateBar(data, expanded = false, containerElement = null) {
         count,
     }));
 
-    // Optionally, sort by numeric value if rates are numbers
-    rateCountsArray.sort((a, b) => {
-        const na = parseFloat(a.key);
-        const nb = parseFloat(b.key);
-        if (!isNaN(na) && !isNaN(nb)) return na - nb;
-        return a.key.localeCompare(b.key);
-    });
+
 
     // Calculate dropout/enrolled proportions for each unemployment rate
     const proportionData = countProportions(data, "Unemployment rate");
-    const ordering = rateCountsArray.map(d => d.key);
+    const ordering = rateCountsArray
+        .map(d => d.key)
+        .sort((a, b) => parseFloat(a) - parseFloat(b));
     const orderedArr = ordering.map(orderKey => {
         const value = proportionData[orderKey];
         if (value === undefined) return null;
@@ -698,10 +701,155 @@ function unemploymentRateBar(data, expanded = false, containerElement = null) {
     render();
 }
 
+/**
+ * Build the inflation rate static bar chart in designated container
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
+function inflationRateBar(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Extract and map data
+    const inflationRates = data.map(d => d["Inflation rate"]);
+    const counts = countOccurrences(inflationRates);
+
+    // Prepare data for bar chart
+    const rateCountsArray = Object.entries(counts).map(([key, count]) => ({
+        key,
+        count,
+    }));
+
+    // Calculate dropout/enrolled proportions for each inflation rate
+    const proportionData = countProportions(data, "Inflation rate");
+    const ordering = rateCountsArray
+        .map(d => d.key)
+        .sort((a, b) => parseFloat(a) - parseFloat(b));
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "Inflation Rate vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
+
+/**
+ * Build the nationality static bar chart in designated container
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
+function nationalityBar(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Extract and map data (translate codes to strings)
+    const nationalities = data.map(d => translateNationalityCode(d["Nacionality"]));
+    const counts = countOccurrences(nationalities);
+
+    // Prepare data for bar chart
+    const nationalityCountsArray = Object.entries(counts).map(([key, count]) => ({
+        key,
+        count,
+    }));
+
+    // Calculate dropout/enrolled proportions for each nationality (using translated string)
+    // We'll build a lookup from code to string for this
+    const codeToString = {};
+    data.forEach(d => {
+        codeToString[d["Nacionality"]] = translateNationalityCode(d["Nacionality"]);
+    });
+    // Remap data with translated keys for countProportions
+    const translatedData = data.map(d => ({
+        ...d,
+        "Nacionality": translateNationalityCode(d["Nacionality"])
+    }));
+    const proportionData = countProportions(translatedData, "Nacionality");
+
+    // Order by count descending, or alphabetically if you prefer
+    const ordering = nationalityCountsArray
+        .sort((a, b) => b.count - a.count)
+        .map(d => d.key);
+
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "Nationality vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
+
 export {
     motherQuals,
     fatherQuals,
     motherJob,
     fatherJob,
-    unemploymentRateBar
+    unemploymentRateBar,
+    inflationRateBar,
+    nationalityBar
 };
