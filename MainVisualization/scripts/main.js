@@ -118,7 +118,7 @@ const chartFunctions = {
     "Father's qualification": fatherQuals,
     "Mother's occupation": motherJob,
     "Father's occupation": fatherJob,
-    "Unemployment rate": unemploymentRateBar,
+    // "Unemployment rate": unemploymentRateBar,
     "Inflation rate": inflationRateBar,
     "Nacionality": nationalityBar,
     "International": internationalStatusBar,
@@ -134,7 +134,8 @@ const chartFunctions = {
 
 
 
-    "Admission grade": showAdmission
+    "Admission grade": showAdmission,
+    "Unemployment rate": showAdmission,
 };
 
 /**

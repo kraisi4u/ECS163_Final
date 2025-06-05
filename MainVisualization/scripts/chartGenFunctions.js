@@ -627,9 +627,14 @@ function drawBarChart(data, svg_id_or_element, title, expanded = false) {
         });
 }
 
-function drawBox(data, svg_id, width, height) {
-    d3.select(svg_id).selectAll("*").remove();
-    const svg = d3.select(svg_id)
+// function drawBox(data, svg_id, width, height) {
+//     d3.select(svg_id).selectAll("*").remove();
+//     const svg = d3.select(svg_id)
+
+
+function drawBox(data, svg, width, height) {
+    svg.selectAll("*").remove();
+    svg
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])
