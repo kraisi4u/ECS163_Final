@@ -114,11 +114,13 @@ const showStaticViz = (currentSlideElement) => {
     const chartFunc = chartFunctions[chartTarget];
     console.log("Chart function:", chartFunc);
     if (chartFunc) {
+        // Find the side chart within the current slide
+        const sideChart = currentSlideElement.select(".side-chart");
+
         //clear side chart
-        d3.select("#side-chart").selectAll('*').remove();
+        sideChart.selectAll("*").remove();
 
         // Add expand button
-        const sideChart = d3.select("#side-chart");
         sideChart
             .append("button")
             .attr("id", "expand-chart-btn")
@@ -142,11 +144,11 @@ const showStaticViz = (currentSlideElement) => {
                     .attr("width", "100%")
                     .attr("height", "100%")
                     .attr("viewBox", `0 0 ${w} ${h}`);
-                chartFunc(allCsvData, true);
+                chartFunc(allCsvData, true, null);
             });
 
         setTimeout(() => {
-        chartFunc(allCsvData);
+            chartFunc(allCsvData, false, sideChart.node());
         }, 200);
     }
 };

@@ -5,13 +5,13 @@ export {
     drawBarChart,
     translateEducationCode,
     countProportions,
-    motherJob
+    motherJob,
 };
 
 /**
  * Translate the education code to readable text
- * @param {the actual code number to transalte} code 
- * @returns 
+ * @param {the actual code number to transalte} code
+ * @returns
  */
 function translateEducationCode(code) {
     const codeMap = {
@@ -43,17 +43,15 @@ function translateEducationCode(code) {
         41: "Specialized higher studies course",
         42: "Professional higher technical course",
         43: "Higher Education - Master (2nd cycle)",
-        44: "Higher Education - Doctorate (3rd cycle)"
+        44: "Higher Education - Doctorate (3rd cycle)",
     };
     return codeMap[Number(code)] || "Unknown code";
 }
 
-
-
 // Helper to count occurrences in an array
 function countOccurrences(arr) {
     const counts = {};
-    arr.forEach(val => {
+    arr.forEach((val) => {
         counts[val] = (counts[val] || 0) + 1;
     });
     return counts;
@@ -63,32 +61,39 @@ function countOccurrences(arr) {
 let motherQualsChartType = "bar";
 /**
  * Function to build all static visualizations for the mother's qualifications.
- * Currently will render a pi chart of the distribution of mother's qualification and a bar chart  
+ * Currently will render a pi chart of the distribution of mother's qualification and a bar chart
  * @param {Array} data - raw dataset to draw from
  * @param {boolean} expanded - whether to render the expanded version of the chart
  */
-function motherQuals(data, expanded = false){
-
+function motherQuals(data, expanded = false, containerElement = null) {
     // Set container and svg_id based on expanded
-    const container = expanded ? "#overlay-chart-container" : "#side-chart";
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
     const svg_id = expanded ? "#graph1-expanded" : "#graph1";
 
-    //Process data 
+    //Process data
 
     //extract and map data from codes to readble labels
-    const motherQuals = data.map(d => translateEducationCode(d["Mother's qualification"]));
+    const motherQuals = data.map((d) =>
+        translateEducationCode(d["Mother's qualification"])
+    );
     const counts = countOccurrences(motherQuals);
 
     //count up each of the qualifications
     const qualCountsArray = Object.entries(counts).map(([key, count]) => ({
         key,
-        count
+        count,
     }));
     console.log("qualCountsArray", qualCountsArray);
 
-
     //process data to consolidate small slices
-    const processedData = consolidateSmallSlices(qualCountsArray, 40)
+    const processedData = consolidateSmallSlices(qualCountsArray, 40);
 
     //Establish ordering of most qualified to least qualified to prepare data for bar chart
     const ordering = [
@@ -120,58 +125,72 @@ function motherQuals(data, expanded = false){
         "Basic education 1st cycle (4th/5th year) or equiv.",
         "Can read without having a 4th year of schooling",
         "Can't read or write",
-        "Unknown"
-        ];
+        "Unknown",
+    ];
     const proportionData = countProportions(data, "Mother's qualification");
-    const orderedArr = ordering
-    .map(orderKey => {
+    const orderedArr = ordering.map((orderKey) => {
         const value = proportionData[orderKey];
         if (value === undefined) return null;
         return { key: orderKey, ...value };
-    })
+    });
     console.log("orderedArr", orderedArr);
 
     // Draw chart and swap button
     function render() {
-        d3.select(container).selectAll("svg").remove();
-        d3.select(container).selectAll("#pie-btn, #bar-btn").remove();
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+        containerSelection.selectAll("#pie-btn, #bar-btn").remove();
         // Buttons
-        
-        d3.select(container)
+
+        containerSelection
             .append("button")
             .attr("id", "bar-btn")
             .text("1")
             .style("margin-right", "8px")
-            .on("click", () => { motherQualsChartType = "bar"; render(); });
+            .on("click", () => {
+                motherQualsChartType = "bar";
+                render();
+            });
 
-        d3.select(container)
+        containerSelection
             .append("button")
             .attr("id", "pie-btn")
             .text("2")
-            .on("click", () => { motherQualsChartType = "pie"; render(); });
+            .on("click", () => {
+                motherQualsChartType = "pie";
+                render();
+            });
 
         // Ensure SVG exists before drawing
-        if (d3.select(container).select(svg_id).empty()) {
-            d3.select(container)
+        if (containerSelection.select(svg_id).empty()) {
+            containerSelection
                 .append("svg")
                 .attr("id", svg_id.replace("#", ""));
-}
-
+        }
 
         // Chart
         if (motherQualsChartType === "pie") {
             console.log("drawing pie chart");
-            drawPiChart(processedData, svg_id, showDrilldownChart, "Mother's Qualifications Distribution", expanded);
+            drawPiChart(
+                processedData,
+                svg_id,
+                showDrilldownChart,
+                "Mother's Qualifications Distribution",
+                expanded
+            );
         } else {
-            drawBarChart(orderedArr, svg_id, "Mother's Qualification vs Dropout Rate", expanded);
+            drawBarChart(
+                orderedArr,
+                svg_id,
+                "Mother's Qualification vs Dropout Rate",
+                expanded
+            );
         }
     }
 
     render();
-
-    
 }
-     
 
 //declare global variable to hold what chart to show
 let fatherQualsChartType = "bar";
@@ -179,27 +198,35 @@ let fatherQualsChartType = "bar";
  * Function to build all static visualizations for the father's qualifications.
  * @param data {csv object} raw dataset to draw from
  */
-function fatherQuals(data, expanded = false){
+function fatherQuals(data, expanded = false, containerElement = null) {
     // Set container and svg_id based on expanded
-    const container = expanded ? "#overlay-chart-container" : "#side-chart";
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
     const svg_id = expanded ? "#graph1-expanded" : "#graph1";
 
-    //Process data 
+    //Process data
 
     //extract and map data from codes to readble labels
-    const fatherQuals = data.map(d => translateEducationCode(d["Father's qualification"]));
+    const fatherQuals = data.map((d) =>
+        translateEducationCode(d["Father's qualification"])
+    );
     const counts = countOccurrences(fatherQuals);
 
     //count up each of the qualifications
     const qualCountsArray = Object.entries(counts).map(([key, count]) => ({
         key,
-        count
+        count,
     }));
     console.log("qualCountsArray", qualCountsArray);
 
-
     //process data to consolidate small slices
-    const processedData = consolidateSmallSlices(qualCountsArray, 40)
+    const processedData = consolidateSmallSlices(qualCountsArray, 40);
 
     //Establish ordering of most qualified to least qualified to prepare data for bar chart
     const ordering = [
@@ -231,57 +258,71 @@ function fatherQuals(data, expanded = false){
         "Basic education 1st cycle (4th/5th year) or equiv.",
         "Can read without having a 4th year of schooling",
         "Can't read or write",
-        "Unknown"
-        ];
+        "Unknown",
+    ];
     const proportionData = countProportions(data, "Father's qualification");
-    const orderedArr = ordering
-    .map(orderKey => {
+    const orderedArr = ordering.map((orderKey) => {
         const value = proportionData[orderKey];
         if (value === undefined) return null;
         return { key: orderKey, ...value };
-    })
+    });
     console.log("orderedArr", orderedArr);
 
     // Draw chart and swap button
     function render() {
-        d3.select(container).selectAll("svg").remove();
-        d3.select(container).selectAll("#pie-btn, #bar-btn").remove();
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+        containerSelection.selectAll("#pie-btn, #bar-btn").remove();
         // Buttons
-        d3.select(container)
+        containerSelection
             .append("button")
             .attr("id", "bar-btn")
             .text("1")
             .style("margin-right", "8px")
-            .on("click", () => { fatherQualsChartType = "bar"; render(); });
+            .on("click", () => {
+                fatherQualsChartType = "bar";
+                render();
+            });
 
-        d3.select(container)
+        containerSelection
             .append("button")
             .attr("id", "pie-btn")
             .text("2")
-            .on("click", () => { fatherQualsChartType = "pie"; render(); });
+            .on("click", () => {
+                fatherQualsChartType = "pie";
+                render();
+            });
 
         // Ensure SVG exists before drawing
-        if (d3.select(container).select(svg_id).empty()) {
-            d3.select(container)
+        if (containerSelection.select(svg_id).empty()) {
+            containerSelection
                 .append("svg")
                 .attr("id", svg_id.replace("#", ""));
-}
-
+        }
 
         // Chart
         if (fatherQualsChartType === "pie") {
             console.log("drawing pie chart");
-            drawPiChart(processedData, svg_id, showDrilldownChart, "Father's Qualifications Distribution", expanded);
+            drawPiChart(
+                processedData,
+                svg_id,
+                showDrilldownChart,
+                "Father's Qualifications Distribution",
+                expanded
+            );
         } else {
-            drawBarChart(orderedArr, svg_id, "Father's Qualification vs Dropout Rate", expanded);
+            drawBarChart(
+                orderedArr,
+                svg_id,
+                "Father's Qualification vs Dropout Rate",
+                expanded
+            );
         }
     }
 
     render();
-
 }
-
-
 
 function translateJobCode(code) {
     const jobMap = {
@@ -316,11 +357,10 @@ function translateJobCode(code) {
         191: "cleaning workers",
         192: "Unskilled workers in agriculture, animal production, fisheries and forestry",
         193: "Unskilled workers in extractive industry, construction, manufacturing and transport",
-        194: "Meal preparation assistants"
+        194: "Meal preparation assistants",
     };
     return jobMap[Number(code)] || "Unknown code";
 }
-
 
 // Global variable to hold what chart to show
 let motherJobChartType = "pie";
@@ -330,77 +370,85 @@ let motherJobChartType = "pie";
  * @param {Array} data - raw dataset to draw from
  * @param {boolean} expanded - whether to render the expanded version of the chart
  */
-function motherJob(data, expanded = false) {
+function motherJob(data, expanded = false, containerElement = null) {
     // Set container and svg_id based on expanded
-    const container = expanded ? "#overlay-chart-container" : "#side-chart";
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
     const svg_id = expanded ? "#graph1-expanded" : "#graph1";
 
-
-
-
     // Extract and map data from codes to readable labels
-    const motherJobs = data.map(d => translateJobCode(d["Mother's occupation"]));
+    const motherJobs = data.map((d) =>
+        translateJobCode(d["Mother's occupation"])
+    );
     const counts = countOccurrences(motherJobs);
 
     // Count up each of the occupations
     const jobCountsArray = Object.entries(counts).map(([key, count]) => ({
         key,
-        count
+        count,
     }));
 
     // Process data to consolidate small slices
     const processedData = consolidateSmallSlices(jobCountsArray, 40);
     console.log("processedData", processedData);
 
-    // Establish ordering for bar chart 
+    // Establish ordering for bar chart
     const ordering = [
-         "Student",
-         "Representatives of the Legislative Power and Executive Bodies, Directors, Directors and Executive Managers",
-         "Specialists in Intellectual and Scientific Activities",
-         "Intermediate Level Technicians and Professions",
-         "Administrative staff",
-         "Personal Services, Security and Safety Workers and Sellers",
-         "Farmers and Skilled Workers in Agriculture, Fisheries and Forestry",
-         "Skilled Workers in Industry, Construction and Craftsmen",
-         "Installation and Machine Operators and Assembly Workers",
-         "Unskilled Workers",
-         "Armed Forces Professions",
-         "Other Situation",
-         "(blank)",
-         "Health professionals",
-         "teachers",
-         "Specialists in information and communication technologies (ICT)",
-         "Intermediate level science and engineering technicians and professions",
-         "Technicians and professionals, of intermediate level of health",
-         "Intermediate level technicians from legal, social, sports, cultural and similar services",
-         "Office workers, secretaries in general and data processing operators",
-         "Data, accounting, statistical, financial services and registry-related operators",
-         "Other administrative support staff",
-         "personal service workers",
-         "sellers",
-         "Personal care workers and the like",
-         "Skilled construction workers and the like, except electricians",
-         "Skilled workers in printing, precision instrument manufacturing, jewelers, artisans and the like",
-         "Workers in food processing, woodworking, clothing and other industries and crafts",
-         "cleaning workers",
-         "Unskilled workers in agriculture, animal production, fisheries and forestry",
-       "Unskilled workers in extractive industry, construction, manufacturing and transport",
-        "Unknown code"
+        "Student",
+        "Representatives of the Legislative Power and Executive Bodies, Directors, Directors and Executive Managers",
+        "Specialists in Intellectual and Scientific Activities",
+        "Intermediate Level Technicians and Professions",
+        "Administrative staff",
+        "Personal Services, Security and Safety Workers and Sellers",
+        "Farmers and Skilled Workers in Agriculture, Fisheries and Forestry",
+        "Skilled Workers in Industry, Construction and Craftsmen",
+        "Installation and Machine Operators and Assembly Workers",
+        "Unskilled Workers",
+        "Armed Forces Professions",
+        "Other Situation",
+        "(blank)",
+        "Health professionals",
+        "teachers",
+        "Specialists in information and communication technologies (ICT)",
+        "Intermediate level science and engineering technicians and professions",
+        "Technicians and professionals, of intermediate level of health",
+        "Intermediate level technicians from legal, social, sports, cultural and similar services",
+        "Office workers, secretaries in general and data processing operators",
+        "Data, accounting, statistical, financial services and registry-related operators",
+        "Other administrative support staff",
+        "personal service workers",
+        "sellers",
+        "Personal care workers and the like",
+        "Skilled construction workers and the like, except electricians",
+        "Skilled workers in printing, precision instrument manufacturing, jewelers, artisans and the like",
+        "Workers in food processing, woodworking, clothing and other industries and crafts",
+        "cleaning workers",
+        "Unskilled workers in agriculture, animal production, fisheries and forestry",
+        "Unskilled workers in extractive industry, construction, manufacturing and transport",
+        "Unknown code",
     ];
     const proportionData = countProportions(data, "Mother's occupation");
     console.log("proportionData", proportionData);
     const orderedArr = ordering
-        .map(orderKey => {
+        .map((orderKey) => {
             const value = proportionData[orderKey];
             if (value === undefined) return null;
             return { key: orderKey, ...value };
         })
-        .filter(d => d !== null);
+        .filter((d) => d !== null);
     console.log("orderedArr", orderedArr);
     // Draw chart and swap button
     function render() {
-        d3.select(container).selectAll("svg").remove();
-        d3.select(container).selectAll("#pie-btn, #bar-btn").remove();
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+        containerSelection.selectAll("#pie-btn, #bar-btn").remove();
 
         // Buttons
         const btnStyle = `
@@ -418,33 +466,50 @@ function motherJob(data, expanded = false) {
             box-sizing: border-box;
         `;
 
-        d3.select(container)
+        containerSelection
             .append("button")
             .attr("id", "bar-btn")
             .attr("style", btnStyle)
             .text("Bar Chart")
-            .on("click", () => { motherJobChartType = "bar"; render(); });
+            .on("click", () => {
+                motherJobChartType = "bar";
+                render();
+            });
 
-        d3.select(container)
+        containerSelection
             .append("button")
             .attr("id", "pie-btn")
             .attr("style", btnStyle)
             .text("Pie Chart")
-            .on("click", () => { motherJobChartType = "pie"; render(); });
+            .on("click", () => {
+                motherJobChartType = "pie";
+                render();
+            });
 
         // Ensure SVG exists before drawing
-        if (d3.select(container).select(svg_id).empty()) {
-            d3.select(container)
+        if (containerSelection.select(svg_id).empty()) {
+            containerSelection
                 .append("svg")
                 .attr("id", svg_id.replace("#", ""));
         }
 
         // Chart
         if (motherJobChartType === "pie") {
-            drawPiChart(processedData, svg_id, showDrilldownChart, "Mother's Occupation Distribution", expanded);
+            drawPiChart(
+                processedData,
+                svg_id,
+                showDrilldownChart,
+                "Mother's Occupation Distribution",
+                expanded
+            );
         } else {
             console.log("drawing bar chart");
-            drawBarChart(orderedArr, svg_id, "Mother's Occupation vs Dropout Rate", expanded);
+            drawBarChart(
+                orderedArr,
+                svg_id,
+                "Mother's Occupation vs Dropout Rate",
+                expanded
+            );
         }
     }
 
@@ -453,30 +518,30 @@ function motherJob(data, expanded = false) {
 
 /**
  * Helper function to consolidate slices below threshold into one "other" slice.
- * @param {data to draw from} data 
- * @param {threshold to consolidate} threshold 
- * @returns 
+ * @param {data to draw from} data
+ * @param {threshold to consolidate} threshold
+ * @returns
  */
 function consolidateSmallSlices(data, threshold) {
-  const main = [];
-  const small = [];
-  let smallSum = 0;
-  data.forEach(d => {
-    if (d.count < threshold) {
-      small.push(d);
-      smallSum += d.count;
-    } else {
-      main.push(d);
-    }
-  });
-  if (small.length) {
-    main.push({
-      key: "Other",
-      count: smallSum,
-      _otherData: small
+    const main = [];
+    const small = [];
+    let smallSum = 0;
+    data.forEach((d) => {
+        if (d.count < threshold) {
+            small.push(d);
+            smallSum += d.count;
+        } else {
+            main.push(d);
+        }
     });
-  }
-  return main;
+    if (small.length) {
+        main.push({
+            key: "Other",
+            count: smallSum,
+            _otherData: small,
+        });
+    }
+    return main;
 }
 
 /**
@@ -486,37 +551,41 @@ function consolidateSmallSlices(data, threshold) {
  * @param {String} ogTitle - Original title of the chart
  */
 function showDrilldownChart(data, svg_id, ogTitle, expanded = false) {
-
-    console.log("drill called")
-    const otherSlice = data.find(d => d.key === "Other");
+    console.log("drill called");
+    const otherSlice = data.find((d) => d.key === "Other");
     if (!otherSlice || !otherSlice._otherData) {
         console.error("No _otherData found for label:Other", data);
         return;
     }
-    if(expanded) {
+    if (expanded) {
         drawPiChart(otherSlice._otherData, svg_id, null, "Other", expanded);
     } else {
         drawPiChart(otherSlice._otherData, svg_id, null, "Other");
     }
     // Add a Back button (optional)
     d3.select(svg_id)
-      .append("text")
-      .attr("x", 20)
-      .attr("y", 30)
-      .attr("fill", "blue")
-      .attr("font-size", "10px")
-      .style("cursor", "pointer")
-      .text("← Back")
-      .on("click", function(){
-        console.log(data);
-        if(expanded) {
-            drawPiChart(data, svg_id, showDrilldownChart, ogTitle, expanded);
-        }else{
-             drawPiChart(data, svg_id, showDrilldownChart, ogTitle)
-        }
-       });
+        .append("text")
+        .attr("x", 20)
+        .attr("y", 30)
+        .attr("fill", "blue")
+        .attr("font-size", "10px")
+        .style("cursor", "pointer")
+        .text("← Back")
+        .on("click", function () {
+            console.log(data);
+            if (expanded) {
+                drawPiChart(
+                    data,
+                    svg_id,
+                    showDrilldownChart,
+                    ogTitle,
+                    expanded
+                );
+            } else {
+                drawPiChart(data, svg_id, showDrilldownChart, ogTitle);
+            }
+        });
 }
-
 
 /**
  * Draw pi chart with d3js
@@ -528,60 +597,65 @@ function showDrilldownChart(data, svg_id, ogTitle, expanded = false) {
  */
 function drawPiChart(data, svg_id, onOtherClick, title, expanded = false) {
     //Set default sizes, intended for minimized viz
-    let width =  350;
-    let height =  350;
+    let width = 350;
+    let height = 350;
     let margin = 80;
     let radius = Math.min(width, height) / 2 - margin;
 
     let labelFontSize = "5px";
     let titleFontSize = "14px";
     let tooltipFontSize = "6px";
-    if(expanded) {
+    if (expanded) {
         console.log("expanded version of chart");
         // If expanded, adjust font sizes
         labelFontSize = "18px";
         titleFontSize = "32px";
         tooltipFontSize = "14px";
         //adjust chart sizes
-        width =  1800;
-        height =  600;
+        width = 1800;
+        height = 600;
         margin = 120;
         radius = Math.min(width, height) / 2 - margin;
     }
     // Select and clear SVG
-    const svg = d3.select(svg_id)
+    const svg = d3
+        .select(svg_id)
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", `0 0 ${width} ${height}`)
-        .attr("style", "max-width: 100%; height: auto; background-color:rgb(255, 255, 255)");
+        .attr(
+            "style",
+            "max-width: 100%; height: auto; background-color:rgb(255, 255, 255)"
+        );
     svg.selectAll("*").remove();
 
     // Main chart group
-    const g = svg.append("g")
-        .attr("transform", `translate(${width/2},${height/2})`);
+    const g = svg
+        .append("g")
+        .attr("transform", `translate(${width / 2},${height / 2})`);
 
     // Tooltip group (background + text)
-    const tooltip = svg.append("g")
-    .attr("id", "svg-tooltip")
-    .style("pointer-events", "none")
-    .style("opacity", 0);
+    const tooltip = svg
+        .append("g")
+        .attr("id", "svg-tooltip")
+        .style("pointer-events", "none")
+        .style("opacity", 0);
 
-    tooltip.append("rect")
-    .attr("fill", "rgba(0,0,0,0.7)")
-    .attr("rx", 6);
+    tooltip.append("rect").attr("fill", "rgba(0,0,0,0.7)").attr("rx", 6);
 
-    tooltip.append("text")
-    .attr("fill", "white")
-    .attr("font-size", tooltipFontSize)
-    .attr("x", 8)
-    .attr("y", 24);
-    
+    tooltip
+        .append("text")
+        .attr("fill", "white")
+        .attr("font-size", tooltipFontSize)
+        .attr("x", 8)
+        .attr("y", 24);
+
     // Pie data
-    const pie = d3.pie().value(d => d.count);
+    const pie = d3.pie().value((d) => d.count);
     const pieData = pie(data);
 
     // Use interpolator for gradient colors
-    const interpolator = d3.interpolateCool; 
+    const interpolator = d3.interpolateCool;
     const numSlices = pieData.length;
 
     // Arc generator
@@ -596,22 +670,22 @@ function drawPiChart(data, svg_id, onOtherClick, title, expanded = false) {
         .attr("d", arc)
         .attr("fill", (d, i) =>
             numSlices === 1
-            ? interpolator(0)
-            : interpolator(i / (numSlices - 1))
+                ? interpolator(0)
+                : interpolator(i / (numSlices - 1))
         )
         .attr("stroke", "white")
         .attr("stroke-width", 2)
         .attr("transform", "translate(0,0)") // <-- Ensure initial transform is set
-        .on("mouseover", function(event, d) {
+        .on("mouseover", function (event, d) {
             tooltip.style("opacity", 1);
-            tooltip.select("text")
-                .text(`${d.data.key} (${d.data.count})`);
+            tooltip.select("text").text(`${d.data.key} (${d.data.count})`);
 
             const textElem = tooltip.select("text").node();
             const bbox = textElem.getBBox();
             const padding = 8;
 
-            tooltip.select("rect")
+            tooltip
+                .select("rect")
                 .attr("x", bbox.x - padding)
                 .attr("y", bbox.y - padding)
                 .attr("width", bbox.width + padding * 2)
@@ -624,102 +698,109 @@ function drawPiChart(data, svg_id, onOtherClick, title, expanded = false) {
                 .duration(150)
                 .attr("transform", `translate(${x * 0.15},${y * 0.15})`);
         })
-        .on("mousemove", function(event, d) {
+        .on("mousemove", function (event, d) {
             const [x, y] = d3.pointer(event, svg.node());
-            var offsetX = 10, offsetY = 10;
-            tooltip.attr("transform", `translate(${x + offsetX},${y + offsetY})`);
+            var offsetX = 10,
+                offsetY = 10;
+            tooltip.attr(
+                "transform",
+                `translate(${x + offsetX},${y + offsetY})`
+            );
         })
-        .on("mouseout", function(event, d) {
+        .on("mouseout", function (event, d) {
             d3.select(this)
                 .transition()
                 .duration(150)
                 .attr("transform", "translate(0,0)"); // <-- Reset transform
             tooltip.style("opacity", 0);
         })
-        .on("click", function(event, d) {
-            if(d.data.key === "Other" && d.data._otherData && typeof onOtherClick === "function") {
-                if(expanded) {
+        .on("click", function (event, d) {
+            if (
+                d.data.key === "Other" &&
+                d.data._otherData &&
+                typeof onOtherClick === "function"
+            ) {
+                if (expanded) {
                     onOtherClick(data, svg_id, title, expanded);
                 } else {
-                onOtherClick(data, svg_id, title);
+                    onOtherClick(data, svg_id, title);
                 }
             }
         })
         .transition()
         .duration(800)
-        .attrTween("d", function(d) {
+        .attrTween("d", function (d) {
             const i = d3.interpolate(
                 { startAngle: d.startAngle, endAngle: d.startAngle },
                 d
             );
-            return function(t) {
+            return function (t) {
                 return arc(i(t));
-            }
+            };
         });
 
-
-
     // Place labels outside the pie with polylines
-    var outerArc = d3.arc()
+    var outerArc = d3
+        .arc()
         .innerRadius(radius * 1.1)
         .outerRadius(radius * 1.1);
 
     g.selectAll("polyline")
-    .data(pieData)
-    .enter()
-    .append("polyline")
-    .attr("points", function(d) {
-        var posA = arc.centroid(d); // centroid of arc
-        var posB = outerArc.centroid(d); // just outside the arc
-        var posC = outerArc.centroid(d); // label position
-        posC[0] = radius * 1.05 * (midAngle(d) < Math.PI ? 1 : -1); // align left/right
-        return [posA, posB, posC];
-    })
-    .style("fill", "none")
-    .style("stroke", "gray")
-    .style("stroke-width", 1)
-    .style("display", function(d) {
-    // hide for small slices 
-        if (!expanded) return "none";
-        return (d.endAngle - d.startAngle) > 0.2 ? null : "none";
-    });
+        .data(pieData)
+        .enter()
+        .append("polyline")
+        .attr("points", function (d) {
+            var posA = arc.centroid(d); // centroid of arc
+            var posB = outerArc.centroid(d); // just outside the arc
+            var posC = outerArc.centroid(d); // label position
+            posC[0] = radius * 1.05 * (midAngle(d) < Math.PI ? 1 : -1); // align left/right
+            return [posA, posB, posC];
+        })
+        .style("fill", "none")
+        .style("stroke", "gray")
+        .style("stroke-width", 1)
+        .style("display", function (d) {
+            // hide for small slices
+            if (!expanded) return "none";
+            return d.endAngle - d.startAngle > 0.2 ? null : "none";
+        });
 
     //render the actual label
     g.selectAll("text")
-    .data(pieData)
-    .enter()
-    .append("text")
-    .attr("font-size", labelFontSize)
-    .attr("transform", function(d) {
-        var pos = outerArc.centroid(d);
-        pos[0] = radius * 1.07 * (midAngle(d) < Math.PI ? 1 : -1);
-        return "translate(" + pos + ")";
-    })
-    .attr("text-anchor", function(d) {
-        return midAngle(d) < Math.PI ? "start" : "end";
-    })
-    .style("display", expanded ? null : "none") //Hide labels if not expanded
-    .text(function(d) {
-      return (d.endAngle - d.startAngle) > 0.2 ? d.data.key : "";
-    });
+        .data(pieData)
+        .enter()
+        .append("text")
+        .attr("font-size", labelFontSize)
+        .attr("transform", function (d) {
+            var pos = outerArc.centroid(d);
+            pos[0] = radius * 1.07 * (midAngle(d) < Math.PI ? 1 : -1);
+            return "translate(" + pos + ")";
+        })
+        .attr("text-anchor", function (d) {
+            return midAngle(d) < Math.PI ? "start" : "end";
+        })
+        .style("display", expanded ? null : "none") //Hide labels if not expanded
+        .text(function (d) {
+            return d.endAngle - d.startAngle > 0.2 ? d.data.key : "";
+        });
 
-    function midAngle(d){ //hide label for small slices
-    return d.startAngle + (d.endAngle - d.startAngle)/2;
+    function midAngle(d) {
+        //hide label for small slices
+        return d.startAngle + (d.endAngle - d.startAngle) / 2;
     }
 
     //render chart title
     svg.append("text")
-        .attr("x", width / 2)         // Centered horizontally in the SVG
-        .attr("y", margin / 2)        // A bit below the top (adjust as needed)
+        .attr("x", width / 2) // Centered horizontally in the SVG
+        .attr("y", margin / 2) // A bit below the top (adjust as needed)
         .attr("text-anchor", "middle")
         .attr("font-size", titleFontSize)
         .attr("font-weight", "bold")
         .attr("fill", "#222")
         .text(title);
-    }
+}
 
-
-//Bar chart functionality  
+//Bar chart functionality
 
 /**
  * Calculates proportions of Enrolled/Graduate vs Dropout for a given factor.
@@ -729,10 +810,13 @@ function drawPiChart(data, svg_id, onOtherClick, title, expanded = false) {
  */
 function countProportions(data, factor) {
     const result = {};
-    data.forEach(d => {
+    data.forEach((d) => {
         let key = d[factor];
         // translate key based on code
-        if (factor === "Mother's qualification" || factor === "Father's qualification") {
+        if (
+            factor === "Mother's qualification" ||
+            factor === "Father's qualification"
+        ) {
             key = translateEducationCode(key);
         } else if (factor === "Mother's occupation") {
             key = translateJobCode(key);
@@ -750,17 +834,15 @@ function countProportions(data, factor) {
     });
 
     // Calculate proportions
-    Object.keys(result).forEach(key => {
+    Object.keys(result).forEach((key) => {
         const { enrolledOrGraduate, dropout, total } = result[key];
-        result[key].enrolledOrGraduatePct = total > 0 ? enrolledOrGraduate / total : 0;
+        result[key].enrolledOrGraduatePct =
+            total > 0 ? enrolledOrGraduate / total : 0;
         result[key].dropoutPct = total > 0 ? dropout / total : 0;
     });
 
     return result;
 }
-
-
-
 
 /**
  * Draws a grouped bar chart about a certain factor mapped to dropout rate,
@@ -785,54 +867,61 @@ function drawBarChart(data, svg_id, title, expanded = false) {
     }
 
     // Prepare the labels and datasets
-    var labels = data.map(d => d.key);
+    var labels = data.map((d) => d.key);
     var subgroups = ["Enrolled or Graduate", "Dropout"];
-    var chartData = data.map(d => ({
+    var chartData = data.map((d) => ({
         label: d.key,
         "Enrolled or Graduate": d.enrolledOrGraduatePct * 100,
-        "Dropout": d.dropoutPct * 100,
-        total: d.total
+        Dropout: d.dropoutPct * 100,
+        total: d.total,
     }));
 
     // Remove existing chart if present
     d3.select(svg_id).selectAll("*").remove();
 
     // Create SVG and chart group
-    var svg = d3.select(svg_id)
+    var svg = d3
+        .select(svg_id)
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-        .attr("style", "max-width: 100%; height: auto; background-color:rgb(255, 255, 255)");
+        .attr(
+            "viewBox",
+            `0 0 ${width + margin.left + margin.right} ${
+                height + margin.top + margin.bottom
+            }`
+        )
+        .attr(
+            "style",
+            "max-width: 100%; height: auto; background-color:rgb(255, 255, 255)"
+        );
 
-    
     // Main group for chart content (this is what will be panned)
-    var chartGroup = svg.append("g")
+    var chartGroup = svg
+        .append("g")
         .attr("class", "chart-content")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
-    // X axis
-    var x0 = d3.scaleBand()
-        .domain(labels)
-        .range([0, width])
-        .paddingInner(0.2);
 
-    var x1 = d3.scaleBand()
+    // X axis
+    var x0 = d3.scaleBand().domain(labels).range([0, width]).paddingInner(0.2);
+
+    var x1 = d3
+        .scaleBand()
         .domain(subgroups)
         .range([0, x0.bandwidth()])
         .padding(0.05);
 
     // Y axis
-    var y = d3.scaleLinear()
-        .domain([0, 100])
-        .range([height, 0]);
+    var y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
 
     // Colors
-    var color = d3.scaleOrdinal()
+    var color = d3
+        .scaleOrdinal()
         .domain(subgroups)
         .range(["#36A2EB", "#FF6384"]);
 
     // Add X axis
-    chartGroup.append("g")
+    chartGroup
+        .append("g")
         .attr("class", "x-axis")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x0))
@@ -842,14 +931,16 @@ function drawBarChart(data, svg_id, title, expanded = false) {
         .attr("font-size", labelFontSize);
 
     // Add Y axis
-    chartGroup.append("g")
+    chartGroup
+        .append("g")
         .attr("class", "y-axis")
         .call(d3.axisLeft(y))
         .selectAll("text")
         .attr("font-size", labelFontSize);
 
     // Y axis label
-    chartGroup.append("text")
+    chartGroup
+        .append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", -margin.left + 50)
         .attr("x", -height / 2)
@@ -859,7 +950,8 @@ function drawBarChart(data, svg_id, title, expanded = false) {
         .text("Proportion of Students (%)");
 
     // X axis label
-    chartGroup.append("text")
+    chartGroup
+        .append("text")
         .attr("x", width / 2)
         .attr("y", height + margin.bottom - 40)
         .attr("text-anchor", "middle")
@@ -868,104 +960,152 @@ function drawBarChart(data, svg_id, title, expanded = false) {
         .text("Factor");
 
     // Title
-    chartGroup.append("text")
+    chartGroup
+        .append("text")
         .attr("x", width / 2)
-        .attr("y", -margin.top / 2 )
+        .attr("y", -margin.top / 2)
         .attr("text-anchor", "middle")
         .attr("font-size", expanded ? "36px" : "18px")
         .attr("font-weight", "bold")
         .text(title);
 
     // Draw bars
-    var groups = chartGroup.selectAll("g.bar-group")
+    var groups = chartGroup
+        .selectAll("g.bar-group")
         .data(chartData)
         .enter()
         .append("g")
         .attr("class", "bar-group")
-        .attr("transform", function(d) { return "translate(" + x0(d.label) + ",0)"; });
+        .attr("transform", function (d) {
+            return "translate(" + x0(d.label) + ",0)";
+        });
 
     //establish tooltip
-    const tooltip = svg.append("g")
+    const tooltip = svg
+        .append("g")
         .attr("id", "svg-tooltip")
         .style("pointer-events", "none")
         .style("opacity", 0);
 
-    tooltip.append("rect")
-        .attr("fill", "rgba(0,0,0,0.7)")
-        .attr("rx", 6);
+    tooltip.append("rect").attr("fill", "rgba(0,0,0,0.7)").attr("rx", 6);
 
-    tooltip.append("text")
+    tooltip
+        .append("text")
         .attr("fill", "white")
         .attr("font-size", expanded ? "28px" : "18px")
         .attr("x", 8)
         .attr("y", 24);
 
     //draw the actual bars
-    groups.selectAll("rect")
-        .data(function(d) {
-            return subgroups.map(function(key) { return { key: key, value: d[key] }; });
+    groups
+        .selectAll("rect")
+        .data(function (d) {
+            return subgroups.map(function (key) {
+                return { key: key, value: d[key] };
+            });
         })
         .enter()
         .append("rect")
-        .attr("x", function(d) { return x1(d.key); })
-        .attr("y", function(d) { return y(0); })
+        .attr("x", function (d) {
+            return x1(d.key);
+        })
+        .attr("y", function (d) {
+            return y(0);
+        })
         .attr("width", x1.bandwidth())
         .attr("height", 0)
-        .attr("fill", function(d) { return color(d.key); })
-        .on("mouseover", function(event, d) {
+        .attr("fill", function (d) {
+            return color(d.key);
+        })
+        .on("mouseover", function (event, d) {
             tooltip.style("opacity", 1);
-            tooltip.select("text")
-                .text(`${d.key} (${d.value.toFixed(1)}%)`);
+            tooltip.select("text").text(`${d.key} (${d.value.toFixed(1)}%)`);
             var textElem = tooltip.select("text").node();
             var bbox = textElem.getBBox();
             var padding = 8;
-            tooltip.select("rect")
+            tooltip
+                .select("rect")
                 .attr("x", bbox.x - padding)
                 .attr("y", bbox.y - padding)
                 .attr("width", bbox.width + padding * 2)
                 .attr("height", bbox.height + padding * 2);
         })
-        .on("mousemove", function(event, d) {
+        .on("mousemove", function (event, d) {
             var coords = d3.pointer(event, svg.node());
-            var offsetX = 0, offsetY = 0;
-            tooltip.attr("transform", "translate(" + (coords[0] + offsetX) + "," + (coords[1] + offsetY) + ")");
+            var offsetX = 0,
+                offsetY = 0;
+            tooltip.attr(
+                "transform",
+                "translate(" +
+                    (coords[0] + offsetX) +
+                    "," +
+                    (coords[1] + offsetY) +
+                    ")"
+            );
         })
-        .on("mouseout", function(event, d) {
+        .on("mouseout", function (event, d) {
             tooltip.style("opacity", 0);
         })
         .transition()
         .duration(800)
-        .delay(function(d, i) { return i * 80; })
-        .attr("y", function(d) { return y(d.value); })
-        .attr("height", function(d) { return height - y(d.value); });
+        .delay(function (d, i) {
+            return i * 80;
+        })
+        .attr("y", function (d) {
+            return y(d.value);
+        })
+        .attr("height", function (d) {
+            return height - y(d.value);
+        });
 
     // Add bar group count labels
-    groups.append("text")
+    groups
+        .append("text")
         .attr("x", x0.bandwidth() / 2)
-        .attr("y", function(d) { 
+        .attr("y", function (d) {
             var maxVal = Math.max(d["Enrolled or Graduate"], d["Dropout"]);
-            return y(maxVal) - 10; 
+            return y(maxVal) - 10;
         })
         .attr("text-anchor", "middle")
         .attr("font-size", expanded ? "22px" : "12px")
         .attr("fill", "#222")
-        .text(function(d) { return "n=" + d.total; });
+        .text(function (d) {
+            return "n=" + d.total;
+        });
 
-    // Add legend 
-    var legend = svg.append("g")
+    // Add legend
+    var legend = svg
+        .append("g")
         .attr("class", "legend")
-        .attr("transform", "translate(" + (margin.left) + "," + (height + margin.top + margin.bottom - subgroups.length * 34 - 10) + ")");
+        .attr(
+            "transform",
+            "translate(" +
+                margin.left +
+                "," +
+                (height +
+                    margin.top +
+                    margin.bottom -
+                    subgroups.length * 34 -
+                    10) +
+                ")"
+        );
 
-    legend.selectAll("g")
+    legend
+        .selectAll("g")
         .data(subgroups)
-        .enter().append("g")
-        .attr("transform", function(d, i) { return "translate(0," + (i * (expanded ? 34 : 24)) + ")"; })
-        .each(function(d, i) {
-            d3.select(this).append("rect")
+        .enter()
+        .append("g")
+        .attr("transform", function (d, i) {
+            return "translate(0," + i * (expanded ? 34 : 24) + ")";
+        })
+        .each(function (d, i) {
+            d3.select(this)
+                .append("rect")
                 .attr("width", expanded ? 28 : 18)
                 .attr("height", expanded ? 28 : 18)
                 .attr("fill", color(d));
-            d3.select(this).append("text")
+            d3.select(this)
+                .append("text")
                 .attr("x", expanded ? 36 : 26)
                 .attr("y", expanded ? 14 : 9)
                 .attr("dy", ".35em")
@@ -974,7 +1114,3 @@ function drawBarChart(data, svg_id, title, expanded = false) {
                 .text(d);
         });
 }
-
-
-
-
