@@ -1471,6 +1471,65 @@ function gdpRateBar(data, expanded = false, containerElement = null) {
     render();
 }
 
+/**
+ * draw Scatter of 3 Kinds of Target
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
+function scatterOf3(data, expanded = false, containerElement = null) {
+
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    //Process data
+    const seletedData = [];
+    for (var row1 of data) {
+        const row2 = {
+            'x1': parseFloat(row1['Admission grade']),
+            'x2': parseFloat(row1['Previous qualification (grade)']),
+            'y': row1['Target']
+        }
+        seletedData.push(row2)
+    }
+
+    // Draw chart and swap button
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+        containerSelection.selectAll("#pie-btn, #bar-btn").remove();
+
+        // Ensure SVG exists before drawing
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawScatter(seletedData, svgElement, expanded);
+    }
+
+    render();
+}
+
+/**
+ * draw Distribution of Previous qualification (grade) and Admission grade
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
 function admissionGradeDistribution(data, expanded = false, containerElement = null) {
 
     // Set container and svg_id based on expanded
@@ -1501,26 +1560,6 @@ function admissionGradeDistribution(data, expanded = false, containerElement = n
             typeof container === "string" ? d3.select(container) : container;
         containerSelection.selectAll("svg").remove();
         containerSelection.selectAll("#pie-btn, #bar-btn").remove();
-        // Buttons
-
-        // containerSelection
-        //     .append("button")
-        //     .attr("id", "bar-btn")
-        //     .text("1")
-        //     .style("margin-right", "8px")
-        //     .on("click", () => {
-        //         motherQualsChartType = "bar";
-        //         render();
-        //     });
-
-        // containerSelection
-        //     .append("button")
-        //     .attr("id", "pie-btn")
-        //     .text("2")
-        //     .on("click", () => {
-        //         motherQualsChartType = "pie";
-        //         render();
-        //     });
 
         // Ensure SVG exists before drawing
         let svgElement;
@@ -1558,4 +1597,5 @@ export {
     gdpRateBar,
 
     admissionGradeDistribution,
+    scatterOf3,
 };

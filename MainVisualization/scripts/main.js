@@ -28,6 +28,7 @@ import {
     gdpRateBar,
 
     admissionGradeDistribution,
+    scatterOf3,
 
 } from "./staticVizFunctions.js";
 
@@ -132,7 +133,8 @@ const chartFunctions = {
     "Scholarship holder": scholarshipStatusBar,
     "GDP": gdpRateBar,
 
-    "Admission grade": admissionGradeDistribution,
+    // "Admission grade": admissionGradeDistribution,
+    "Admission grade": scatterOf3,
 };
 
 /**

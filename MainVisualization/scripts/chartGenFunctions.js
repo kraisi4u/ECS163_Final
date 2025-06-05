@@ -627,6 +627,12 @@ function drawBarChart(data, svg_id_or_element, title, expanded = false) {
         });
 }
 
+/**
+ * draw a box chart
+ * @param {*} data 
+ * @param {*} svg 
+ * @param {*} expanded 
+ */
 function drawBox(data, svg, expanded) {
 
     let width, height;
@@ -636,11 +642,8 @@ function drawBox(data, svg, expanded) {
         width = winWidth;
         height = 800;
     }else{
-        width = 500;
-        height = 500;
-
         width = 1000;
-        height = 800;
+        height = 600;
     }
 
     svg.selectAll("*").remove();
@@ -761,13 +764,30 @@ function drawBox(data, svg, expanded) {
     });
 }
 
-function drawScatter(data, svg, width, height) {
+/**
+ * draw a scatter chart
+ * @param {*} data 
+ * @param {*} svg 
+ * @param {*} expanded 
+ */
+function drawScatter(data, svg, expanded) {
+
+    let width, height;
+    const winWidth = window.innerWidth;
+
+    if(expanded){
+        width = winWidth;
+        height = 800;
+    }else{
+        width = 1000;
+        height = 600;
+    }
     svg.selectAll("*").remove();
     svg
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])
-        .attr("style", "max-width: 100%; height: auto; background-color:rgb(240,255,240)");
+        .attr("style", "max-width: 100%; height: auto; background-color:rgb(255,255,255)");
 
     // creata x and y scale
     const x_scale = d3.scaleLinear().domain([0, 200]).range([0, width - 200]);
@@ -880,9 +900,6 @@ function drawScatter(data, svg, width, height) {
 
     svg.call(zoom);
 }
-
-
-
 
 export {
     consolidateSmallSlices,
