@@ -47,6 +47,8 @@ The user can move between slides by using the left and right arrow keys.
 
 The user can move up and down between slides that are alternatives to each other using the blue button at the bottom of each slide that says "Switch to next alternative".
 
+In the main vusalization, the user can click on any originating box (nodes on the left column), and select it to filter only the flows coming out of that node. The user can deselect the node by clicking in the background, or by clicking on the node box again.
+
 For slides with small (static) visualizations on the left side, users can click the arrow button in the top-right corner of the visualization to expand it to full screen.
 
 Some static visualization have additional buttons to change between alternative static visualizations.
