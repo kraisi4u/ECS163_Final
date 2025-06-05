@@ -323,6 +323,7 @@ let motherJobChartType = "bar";
  * Renders a pie chart of the distribution of mother's occupation and a bar chart.
  * @param {Array} data - raw dataset to draw from
  * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - container to render viz in 
  */
 function motherJob(data, expanded = false, containerElement = null) {
     // Set container and svg_id based on expanded
@@ -626,9 +627,81 @@ function fatherJob(data, expanded = false, containerElement = null) {
 }
 
 
+/**
+ * Build the unemployment rate static vis in designated container
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
+function unemploymentRateBar(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Extract and map data
+    const unemploymentRates = data.map(d => d["Unemployment rate"]);
+    const counts = countOccurrences(unemploymentRates);
+
+    // Prepare data for bar chart
+    const rateCountsArray = Object.entries(counts).map(([key, count]) => ({
+        key,
+        count,
+    }));
+
+    // Optionally, sort by numeric value if rates are numbers
+    rateCountsArray.sort((a, b) => {
+        const na = parseFloat(a.key);
+        const nb = parseFloat(b.key);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return a.key.localeCompare(b.key);
+    });
+
+    // Calculate dropout/enrolled proportions for each unemployment rate
+    const proportionData = countProportions(data, "Unemployment rate");
+    const ordering = rateCountsArray.map(d => d.key);
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "Unemployment Rate vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
+
 export {
     motherQuals,
     fatherQuals,
     motherJob,
-    fatherJob
+    fatherJob,
+    unemploymentRateBar
 };
