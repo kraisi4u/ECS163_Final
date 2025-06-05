@@ -33,7 +33,9 @@ import {
     displacedStatusBar,
     courseBar,
     secondSemesterGradesBar,
-    firstSemesterGradesBar
+    firstSemesterGradesBar,
+    firstSemesterEnrolledBar,
+    secondSemesterEnrolledBar
 
 } from "./staticVizFunctions.js";
 
@@ -145,6 +147,8 @@ const chartFunctions = {
     "Course": courseBar,
     "Curricular units 2nd sem (grade)": secondSemesterGradesBar,
     "Curricular units 1st sem (grade)": firstSemesterGradesBar,
+    "Curricular units 1st sem (enrolled)": firstSemesterEnrolledBar,
+    "Curricular units 2nd sem (enrolled)": secondSemesterEnrolledBar,
 };
 
 /**

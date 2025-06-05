@@ -368,12 +368,12 @@ function drawBarChart(data, svg_id_or_element, title, expanded = false) {
         margin = { top: 150, right: 200, bottom: 250, left: 180 };
         width = 1800 - margin.left - margin.right;
         height = 900 - margin.top - margin.bottom;
-        labelFontSize = "18px";
+        labelFontSize = "24px";
     } else {
         margin = { top: 200, right: 170, bottom: 250, left: 100 };
         width = 1200 - margin.left - margin.right;
         height = 1200 - margin.top - margin.bottom;
-        labelFontSize = "16px";
+        labelFontSize = "20px";
     }
 
     // Prepare the labels and datasets
@@ -457,7 +457,7 @@ function drawBarChart(data, svg_id_or_element, title, expanded = false) {
         .attr("y", -margin.left + 50)
         .attr("x", -height / 2)
         .attr("text-anchor", "middle")
-        .attr("font-size", labelFontSize + 10)
+        .attr("font-size", labelFontSize)
         .attr("font-weight", "bold")
         .text("Proportion of Students (%)");
 
@@ -468,7 +468,7 @@ function drawBarChart(data, svg_id_or_element, title, expanded = false) {
         .attr("y", height + margin.bottom - 40)
         .attr("text-anchor", "middle")
         .attr("font-weight", "bold")
-        .attr("font-size", labelFontSize + 10)
+        .attr("font-size", labelFontSize)
         .text("Factor");
 
     // Title
@@ -477,7 +477,7 @@ function drawBarChart(data, svg_id_or_element, title, expanded = false) {
         .attr("x", width / 2)
         .attr("y", -margin.top / 2)
         .attr("text-anchor", "middle")
-        .attr("font-size", expanded ? "36px" : "22px")
+        .attr("font-size", expanded ? "36px" : "30px")
         .attr("font-weight", "bold")
         .text(title);
 
