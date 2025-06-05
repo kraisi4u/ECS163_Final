@@ -627,18 +627,28 @@ function drawBarChart(data, svg_id_or_element, title, expanded = false) {
         });
 }
 
-// function drawBox(data, svg_id, width, height) {
-//     d3.select(svg_id).selectAll("*").remove();
-//     const svg = d3.select(svg_id)
+function drawBox(data, svg, expanded) {
 
+    let width, height;
+    const winWidth = window.innerWidth;
 
-function drawBox(data, svg, width, height) {
+    if(expanded){
+        width = winWidth;
+        height = 800;
+    }else{
+        width = 500;
+        height = 500;
+
+        width = 1000;
+        height = 800;
+    }
+
     svg.selectAll("*").remove();
     svg
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])
-        .attr("style", "max-width: 100%; height: auto; background-color:rgb(240,255,240)");
+        .attr("style", "max-width: 100%; height: auto; background-color:rgb(255,255,255)");
 
     // creata x and y scale
     const x_scale = d3.scaleBand().domain(['x1', 'x2']).range([0, width - 200])
@@ -751,9 +761,9 @@ function drawBox(data, svg, width, height) {
     });
 }
 
-function drawScatter(data, svg_id, width, height) {
-    d3.select(svg_id).selectAll("*").remove();
-    const svg = d3.select(svg_id)
+function drawScatter(data, svg, width, height) {
+    svg.selectAll("*").remove();
+    svg
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])

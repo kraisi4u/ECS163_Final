@@ -27,7 +27,7 @@ import {
     scholarshipStatusBar,
     gdpRateBar,
 
-    showAdmission
+    admissionGradeDistribution,
 
 } from "./staticVizFunctions.js";
 
@@ -132,7 +132,7 @@ const chartFunctions = {
     "Scholarship holder": scholarshipStatusBar,
     "GDP": gdpRateBar,
 
-    "Admission grade": showAdmission,
+    "Admission grade": admissionGradeDistribution,
 };
 
 /**
