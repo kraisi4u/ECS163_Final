@@ -27,6 +27,10 @@ import { //functions to translate int codes to human readable labels
     translateCourseCode,
 } from "./translations.js";
  
+import { //for creating the same bins
+    getGradeBinsForColumn, findGradeBin, cleanAndParseGrade
+} from "./dataLoader.js"; // Make sure to import getGradeBinsForColumn and findGradeBin
+
 
 
 // Helper to count occurrences in an array
@@ -1861,6 +1865,149 @@ function courseBar(data, expanded = false, containerElement = null) {
     render();
 }
 
+
+/**
+ * Build static bar chart for Second Semester - Grades vs dropout rate
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ * @param {Array} allCsvData - the entire dataset, needed for consistent binning
+ */
+function secondSemesterGradesBar(data, expanded = false, containerElement = null, allCsvData = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Get bins for "Second Semester - Grades" using allCsvData for consistency
+    const columnKey = "Curricular units 2nd sem (grade)";
+    const bins = getGradeBinsForColumn(allCsvData || data, columnKey);
+
+    // Bin the grades for each row
+    const binData = data.map(d => {
+        const grade = cleanAndParseGrade(d[columnKey]);
+        const binLabel = findGradeBin(grade, bins);
+        return {
+            ...d,
+            "Grade Bin": binLabel || "Unknown"
+        };
+    });
+    console.log(binData);
+    // Calculate proportions for each bin
+    const proportionData = countProportions(binData, "Grade Bin");
+    console.log(proportionData);
+    // Order bins as in the main visualization
+    const ordering = bins.map(bin => bin.label).filter(label => proportionData[label] !== undefined);
+
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+    console.log(orderedArr);
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "Second Semester - Grades vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
+
+/**
+ * Build static bar chart for First Semester - Grades vs dropout rate
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ * @param {Array} allCsvData - the entire dataset, needed for consistent binning
+ */
+function firstSemesterGradesBar(data, expanded = false, containerElement = null, allCsvData = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Get bins for "Second Semester - Grades" using allCsvData for consistency
+    const columnKey = "Curricular units 1st sem (grade)";
+    const bins = getGradeBinsForColumn(allCsvData || data, columnKey);
+
+    // Bin the grades for each row
+    const binData = data.map(d => {
+        const grade = cleanAndParseGrade(d[columnKey]);
+        const binLabel = findGradeBin(grade, bins);
+        return {
+            ...d,
+            "Grade Bin": binLabel || "Unknown"
+        };
+    });
+    console.log(binData);
+    // Calculate proportions for each bin
+    const proportionData = countProportions(binData, "Grade Bin");
+    console.log(proportionData);
+    // Order bins as in the main visualization
+    const ordering = bins.map(bin => bin.label).filter(label => proportionData[label] !== undefined);
+
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+    console.log(orderedArr);
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "First Semester - Grades vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
+
 export {
     motherQuals,
     fatherQuals,
@@ -1883,5 +2030,7 @@ export {
     scatterOf3,
     maritalStatusBar,
     displacedStatusBar,
-    courseBar
+    courseBar,
+    secondSemesterGradesBar,
+    firstSemesterGradesBar
 };

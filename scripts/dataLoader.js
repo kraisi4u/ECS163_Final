@@ -398,4 +398,4 @@ const getRawDataForTwoColumns = async (
     return pairedValues;
 };
 
-export { loadCategoricalData, loadGradeData, getRawDataForTwoColumns };
+export { loadCategoricalData, loadGradeData, getRawDataForTwoColumns, getGradeBinsForColumn, findGradeBin, cleanAndParseGrade};

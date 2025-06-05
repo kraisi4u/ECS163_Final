@@ -31,7 +31,9 @@ import {
     scatterOf3,
     maritalStatusBar,
     displacedStatusBar,
-    courseBar
+    courseBar,
+    secondSemesterGradesBar,
+    firstSemesterGradesBar
 
 } from "./staticVizFunctions.js";
 
@@ -141,6 +143,8 @@ const chartFunctions = {
     "Marital status": maritalStatusBar,
     "Displaced": displacedStatusBar,
     "Course": courseBar,
+    "Curricular units 2nd sem (grade)": secondSemesterGradesBar,
+    "Curricular units 1st sem (grade)": firstSemesterGradesBar,
 };
 
 /**
