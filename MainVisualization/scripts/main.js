@@ -10,7 +10,7 @@ import {
     loadGradeData,
     getRawDataForTwoColumns,
 } from "./dataLoader.js";
-import { motherQuals, fatherQuals, motherJob, fatherJob } from "./csawStatVis.js";
+import { motherQuals, fatherQuals, motherJob, fatherJob } from "./staticVizFunctions.js";
 
 let currentSlide = 0;
 const slides = d3.selectAll(".slide");
