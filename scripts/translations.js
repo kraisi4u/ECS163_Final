@@ -353,6 +353,20 @@ function translateAttendanceSection(value) {
     return "Unknown";
 }
 
+
+/**
+ * Translate the gender code to readable text
+ * @param {numbers tring} code - the code to translate
+ * @returns {string} - "Male" or "Female"
+ */
+function translateGenderCode(code) {
+    const codeMap = {
+        1: "Male",
+        0: "Female"
+    };
+    return codeMap[Number(code)] || "Other";
+}
+
 export {
     translateEducationCode,
     translateFatherJobCode,
@@ -363,5 +377,6 @@ export {
     translateNationalityCode,
     translateYesNo,
     translatePreviousQualification,
-    translateAttendanceSection
+    translateAttendanceSection,
+    translateGenderCode
 };

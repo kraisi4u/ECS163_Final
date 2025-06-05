@@ -26,7 +26,7 @@ import {
     ageEnrollmentBar,
     scholarshipStatusBar,
     gdpRateBar,
-
+    genderBar,
     admissionGradeDistribution,
     scatterOf3,
 
@@ -132,8 +132,8 @@ const chartFunctions = {
     "Age at enrollment": ageEnrollmentBar,
     "Scholarship holder": scholarshipStatusBar,
     "GDP": gdpRateBar,
-
-    // "Admission grade": admissionGradeDistribution,
+    "Gender": genderBar,
+    "Previous qualification (grade)": admissionGradeDistribution,
     "Admission grade": scatterOf3,
 };
 

@@ -21,7 +21,8 @@ import { //functions to translate int codes to human readable labels
     translateNationalityCode,
     translateYesNo,
     translatePreviousQualification,
-    translateAttendanceSection
+    translateAttendanceSection,
+    translateGenderCode
 } from "./translations.js";
  
 
@@ -1577,6 +1578,70 @@ function admissionGradeDistribution(data, expanded = false, containerElement = n
     render();
 }
 
+/**
+ * Build static bar chart for gender vs dropout rate
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
+function genderBar(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Extract and map data (translate codes to Male/Female)
+    const genders = data.map(d => translateGenderCode(d["Gender"]));
+    const counts = countOccurrences(genders);
+
+    // Remap data with translated keys for countProportions
+    const translatedData = data.map(d => ({
+        ...d,
+        "Gender": translateGenderCode(d["Gender"])
+    }));
+    const proportionData = countProportions(translatedData, "Gender");
+
+    // Order by Male, Female (or whatever is present)
+    const ordering = ["Male", "Female", "Other"].filter(k => counts[k] !== undefined);
+
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "Gender vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
+
 
 export {
     motherQuals,
@@ -1595,7 +1660,7 @@ export {
     ageEnrollmentBar,
     scholarshipStatusBar,
     gdpRateBar,
-
+    genderBar,
     admissionGradeDistribution,
     scatterOf3,
 };
