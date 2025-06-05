@@ -866,11 +866,7 @@ function internationalStatusBar(data, expanded = false, containerElement = null)
     const statuses = data.map(d => translateYesNo(d["International"]));
     const counts = countOccurrences(statuses);
 
-    // Prepare data for bar chart
-    const statusCountsArray = Object.entries(counts).map(([key, count]) => ({
-        key,
-        count,
-    }));
+
 
     // Remap data with translated keys for countProportions
     const translatedData = data.map(d => ({
@@ -914,6 +910,135 @@ function internationalStatusBar(data, expanded = false, containerElement = null)
     render();
 }
 
+
+/**
+ * Build the tuition payment status static bar chart in designated container
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
+function tuitionPaymentStatusBar(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Extract and map data (translate codes to Yes/No)
+    const statuses = data.map(d => translateYesNo(d["Tuition fees up to date"]));
+    const counts = countOccurrences(statuses);
+
+    // Remap data with translated keys for countProportions
+    const translatedData = data.map(d => ({
+        ...d,
+        "Tuition fees up to date": translateYesNo(d["Tuition fees up to date"])
+    }));
+    const proportionData = countProportions(translatedData, "Tuition fees up to date");
+
+    // Order by Yes/No (Yes first, then No, then Unknown)
+    const ordering = ["Yes", "No", "Unknown"].filter(k => counts[k] !== undefined);
+
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "Tuition Payment Status vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
+
+/**
+ * Build the debtor status static bar chart in designated container
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
+function debtorStatusBar(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Extract and map data (translate codes to Yes/No)
+    const statuses = data.map(d => translateYesNo(d["Debtor"]));
+    const counts = countOccurrences(statuses);
+
+    // Remap data with translated keys for countProportions
+    const translatedData = data.map(d => ({
+        ...d,
+        "Debtor": translateYesNo(d["Debtor"])
+    }));
+    const proportionData = countProportions(translatedData, "Debtor");
+
+    // Order by Yes/No (Yes first, then No, then Unknown)
+    const ordering = ["Yes", "No", "Unknown"].filter(k => counts[k] !== undefined);
+
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "Debtor Status vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
+
 export {
     motherQuals,
     fatherQuals,
@@ -922,5 +1047,7 @@ export {
     unemploymentRateBar,
     inflationRateBar,
     nationalityBar,
-    internationalStatusBar
+    internationalStatusBar,
+    tuitionPaymentStatusBar,
+    debtorStatusBar
 };

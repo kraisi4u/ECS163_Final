@@ -18,6 +18,9 @@ import {
     inflationRateBar, 
     nationalityBar,
     internationalStatusBar,
+    tuitionPaymentStatusBar,
+    debtorStatusBar,
+
 } from "./staticVizFunctions.js";
 
 let currentSlide = 0;
@@ -111,6 +114,8 @@ const chartFunctions = {
     "Inflation rate": inflationRateBar,
     "Nacionality": nationalityBar,
     "International": internationalStatusBar,
+    "Tuition fees up to date": tuitionPaymentStatusBar,
+    "Debtor": debtorStatusBar,
     // Add more mappings as needed
 };
 
