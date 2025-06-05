@@ -16,7 +16,9 @@ import {
     motherJob, fatherJob, 
     unemploymentRateBar,
     inflationRateBar, 
-    nationalityBar} from "./staticVizFunctions.js";
+    nationalityBar,
+    internationalStatusBar,
+} from "./staticVizFunctions.js";
 
 let currentSlide = 0;
 const slides = d3.selectAll(".slide");
@@ -108,6 +110,7 @@ const chartFunctions = {
     "Unemployment rate": unemploymentRateBar,
     "Inflation rate": inflationRateBar,
     "Nacionality": nationalityBar,
+    "International": internationalStatusBar,
     // Add more mappings as needed
 };
 
