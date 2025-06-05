@@ -4,6 +4,9 @@
  */
 
 import {      //functions that actually draw the charts
+    drawBox,
+    drawScatter,
+
     drawPiChart,
     drawBarChart,
     countProportions,    
@@ -1466,6 +1469,76 @@ function gdpRateBar(data, expanded = false, containerElement = null) {
     render();
 }
 
+function showAdmission(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    //Process data
+
+
+
+    // Draw chart and swap button
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+        containerSelection.selectAll("#pie-btn, #bar-btn").remove();
+        // Buttons
+
+        containerSelection
+            .append("button")
+            .attr("id", "bar-btn")
+            .text("1")
+            .style("margin-right", "8px")
+            .on("click", () => {
+                motherQualsChartType = "bar";
+                render();
+            });
+
+        containerSelection
+            .append("button")
+            .attr("id", "pie-btn")
+            .text("2")
+            .on("click", () => {
+                motherQualsChartType = "pie";
+                render();
+            });
+
+        // Ensure SVG exists before drawing
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        const seletedData = [];
+        for (var row1 of data) {
+            const row2 = {
+                'x1': parseFloat(row1['Admission grade']),
+                'x2': parseFloat(row1['Previous qualification (grade)']),
+                'y': row1['Target']
+            }
+            seletedData.push(row2)
+        }
+        console.log(seletedData)
+
+        drawBox(seletedData, '#graph1', 500, 250);
+    }
+
+    render();
+}
+
 export {
     motherQuals,
     fatherQuals,
@@ -1482,5 +1555,7 @@ export {
     attendanceSectionStatusBar,
     ageEnrollmentBar,
     scholarshipStatusBar,
-    gdpRateBar
+    gdpRateBar,
+
+    showAdmission,
 };

@@ -25,7 +25,9 @@ import {
     attendanceSectionStatusBar,
     ageEnrollmentBar,
     scholarshipStatusBar,
-    gdpRateBar
+    gdpRateBar,
+
+    showAdmission
 
 } from "./staticVizFunctions.js";
 
@@ -128,7 +130,11 @@ const chartFunctions = {
     "Daytime/evening attendance": attendanceSectionStatusBar,
     "Age at enrollment": ageEnrollmentBar,
     "Scholarship holder": scholarshipStatusBar,
-    "GDP": gdpRateBar
+    "GDP": gdpRateBar,
+
+
+
+    "Admission grade": showAdmission
 };
 
 /**
