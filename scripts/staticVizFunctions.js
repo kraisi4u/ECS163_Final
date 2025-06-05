@@ -42,7 +42,7 @@ function countOccurrences(arr) {
     return counts;
 }
 
-//declare global variable to hold what chart to show
+//declare global variable to hold what chart to show first
 let motherQualsChartType = "bar";
 /**
  * Function to build all static visualizations for the mother's qualifications.
@@ -187,7 +187,7 @@ function motherQuals(data, expanded = false, containerElement = null) {
     render();
 }
 
-//declare global variable to hold what chart to show
+//declare global variable to hold what chart to show first
 let fatherQualsChartType = "bar";
 /**
  * Function to build all static visualizations for the father's qualifications.

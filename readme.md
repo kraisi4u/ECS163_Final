@@ -18,9 +18,9 @@ MainVisualization/
     ├── main.js               The core of our slides, imports all other js, handles slide transitions and calling functions
     ├── dataLoader.js         Loads data and do some processing (eg. numerical to catagorical)
     ├── chart.js              Where the main chart is done
-    ├── chartGenFunctions.js  CSAW FILL THIS IN
-    ├── staticVizFunctions.js CSAW FILL THIS IN
-    └── translations.js       CSAW FILL THIS IN
+    ├── chartGenFunctions.js  Functions for generating side visulizations (Bar, Pie, Scatter, Box)
+    ├── staticVizFunctions.js Functions for generating specific side visulization (EG: All visulizations for Mother's Occupation)
+    └── translations.js       Functions for translating csv data into human readable text
 ```
 
 ## Description
@@ -29,9 +29,12 @@ We aimed to create a continous alluval inspired diagram for our main visualizati
 
 In order to avoid unnessary complexity, we structured our project as a basic html + js project, without external frameworks with the exception of d3. The index.html sets up the slides and styles. It also loads d3, the font, and main.js as an esmodule. All other files are imported within main.js to handle each part of our functionality.
 
-Our data needed additional interpretation beyond what is in the CSV, so we used chatgpt and the data card from the UCI source to create an description.json, used in our visualizations. The dataLoader.js file handles loading and processing data for the main visualization. The chart.js handles drawing the charts
+Our data needed additional interpretation beyond what is in the CSV, so we used the data card from the UCI source to create an description.json, used in our visualizations. The dataLoader.js file handles loading and processing data for the main visualization. The chart.js handles drawing the charts
 
-CSAW ADD DETAILS ON THE SUB VIZ
+Finally all our side visulizations are handled within chartGenFunctions.js, staticVizFunctions.js, and translations.js, which work in tandem
+to generate the visulizations. Within main we have mapped the corresponding staticVizFunction which handles how that data should be processed
+and which kind of chart it should generate. Since it can be easy to get lost in the larger main visulization, we focussed on mainly
+mapping each factor to the factor we cared most about, the dropout rate. 
 
 ## Installation
 

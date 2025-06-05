@@ -138,6 +138,7 @@ const jobShortLabels = {
     "Other": "Other" // for consolidated slices
 };
 
+//shortened labels for father's job to make more readable
 const fatherJobShortLabels = {
     "Student": "Student",
     "Representatives of the Legislative Power and Executive Bodies, Directors, Directors and Executive Managers": "Executives",
@@ -187,6 +188,7 @@ const fatherJobShortLabels = {
     "Street vendors (except food) and street service providers": "Street Vendors"
 };
 
+//Shortened labels for qualifications 
 const qualificationShortLabels = {
     "Higher Education - Doctorate (3rd cycle)": "PhD (3rd cycle)",
     "Higher Education - Doctorate": "PhD",
