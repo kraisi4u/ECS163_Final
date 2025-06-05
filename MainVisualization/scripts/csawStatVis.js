@@ -6,6 +6,7 @@ export {
     translateEducationCode,
     countProportions,
     motherJob,
+    fatherJob,
 };
 
 /**
@@ -48,7 +49,63 @@ function translateEducationCode(code) {
     return codeMap[Number(code)] || "Unknown code";
 }
 
-//shortened labels for rendering in charts
+/** * Translate the father's job code to readable text
+ * @param {int} code - actual code to translate
+ * @returns {string} - readable text for the job code
+ */
+function translateFatherJobCode(code) {
+    const jobMap = {
+        0: "Student",
+        1: "Representatives of the Legislative Power and Executive Bodies, Directors, Directors and Executive Managers",
+        2: "Specialists in Intellectual and Scientific Activities",
+        3: "Intermediate Level Technicians and Professions",
+        4: "Administrative staff",
+        5: "Personal Services, Security and Safety Workers and Sellers",
+        6: "Farmers and Skilled Workers in Agriculture, Fisheries and Forestry",
+        7: "Skilled Workers in Industry, Construction and Craftsmen",
+        8: "Installation and Machine Operators and Assembly Workers",
+        9: "Unskilled Workers",
+        10: "Armed Forces Professions",
+        90: "Other Situation",
+        99: "(blank)",
+        101: "Armed Forces Officers",
+        102: "Armed Forces Sergeants",
+        103: "Other Armed Forces personnel",
+        112: "Directors of administrative and commercial services",
+        114: "Hotel, catering, trade and other services directors",
+        121: "Specialists in the physical sciences, mathematics, engineering and related techniques",
+        122: "Health professionals",
+        123: "teachers",
+        124: "Specialists in finance, accounting, administrative organization, public and commercial relations",
+        131: "Intermediate level science and engineering technicians and professions",
+        132: "Technicians and professionals, of intermediate level of health",
+        134: "Intermediate level technicians from legal, social, sports, cultural and similar services",
+        135: "Information and communication technology technicians",
+        141: "Office workers, secretaries in general and data processing operators",
+        143: "Data, accounting, statistical, financial services and registry-related operators",
+        144: "Other administrative support staff",
+        151: "personal service workers",
+        152: "sellers",
+        153: "Personal care workers and the like",
+        154: "Protection and security services personnel",
+        161: "Market-oriented farmers and skilled agricultural and animal production workers",
+        163: "Farmers, livestock keepers, fishermen, hunters and gatherers, subsistence",
+        171: "Skilled construction workers and the like, except electricians",
+        172: "Skilled workers in metallurgy, metalworking and similar",
+        174: "Skilled workers in electricity and electronics",
+        175: "Workers in food processing, woodworking, clothing and other industries and crafts",
+        181: "Fixed plant and machine operators",
+        182: "assembly workers",
+        183: "Vehicle drivers and mobile equipment operators",
+        192: "Unskilled workers in agriculture, animal production, fisheries and forestry",
+        193: "Unskilled workers in extractive industry, construction, manufacturing and transport",
+        194: "Meal preparation assistants",
+        195: "Street vendors (except food) and street service providers"
+    };
+    return jobMap[Number(code)] || "Unknown code";
+}
+
+//shortened labels for rendering in charts to make more readdable
 const jobShortLabels = {
     "Student": "Student",
     "Representatives of the Legislative Power and Executive Bodies, Directors, Directors and Executive Managers": "Executives",
@@ -83,6 +140,87 @@ const jobShortLabels = {
     "Unskilled workers in extractive industry, construction, manufacturing and transport": "Unskilled Industry",
     "Unknown code": "Unknown",
     "Other": "Other" // for consolidated slices
+};
+
+const fatherJobShortLabels = {
+    "Student": "Student",
+    "Representatives of the Legislative Power and Executive Bodies, Directors, Directors and Executive Managers": "Executives",
+    "Specialists in Intellectual and Scientific Activities": "Scientists",
+    "Intermediate Level Technicians and Professions": "Technicians",
+    "Administrative staff": "Admin",
+    "Personal Services, Security and Safety Workers and Sellers": "Service/Security/Sales",
+    "Farmers and Skilled Workers in Agriculture, Fisheries and Forestry": "Farmers",
+    "Skilled Workers in Industry, Construction and Craftsmen": "Industry/Construction",
+    "Installation and Machine Operators and Assembly Workers": "Machine Operators",
+    "Unskilled Workers": "Unskilled",
+    "Armed Forces Professions": "Military",
+    "Other Situation": "Other",
+    "(blank)": "(blank)",
+    "Armed Forces Officers": "AF Officers",
+    "Armed Forces Sergeants": "AF Sergeants",
+    "Other Armed Forces personnel": "AF Other",
+    "Directors of administrative and commercial services": "Admin/Commercial Dir.",
+    "Hotel, catering, trade and other services directors": "Hotel/Trade Dir.",
+    "Specialists in the physical sciences, mathematics, engineering and related techniques": "STEM Specialists",
+    "Health professionals": "Health",
+    "teachers": "Teachers",
+    "Specialists in finance, accounting, administrative organization, public and commercial relations": "Finance/Admin Specialists",
+    "Intermediate level science and engineering technicians and professions": "Sci/Eng Techs",
+    "Technicians and professionals, of intermediate level of health": "Health Techs",
+    "Intermediate level technicians from legal, social, sports, cultural and similar services": "Legal/Social/Sports Techs",
+    "Information and communication technology technicians": "ICT Techs",
+    "Office workers, secretaries in general and data processing operators": "Office/Data",
+    "Data, accounting, statistical, financial services and registry-related operators": "Finance/Registry",
+    "Other administrative support staff": "Other Admin",
+    "personal service workers": "Service Workers",
+    "sellers": "Sellers",
+    "Personal care workers and the like": "Care Workers",
+    "Protection and security services personnel": "Security",
+    "Market-oriented farmers and skilled agricultural and animal production workers": "Market Farmers",
+    "Farmers, livestock keepers, fishermen, hunters and gatherers, subsistence": "Subsistence Farmers",
+    "Skilled construction workers and the like, except electricians": "Construction",
+    "Skilled workers in metallurgy, metalworking and similar": "Metalwork",
+    "Skilled workers in electricity and electronics": "Electricians/Electronics",
+    "Workers in food processing, woodworking, clothing and other industries and crafts": "Food/Wood/Clothing",
+    "Fixed plant and machine operators": "Plant Operators",
+    "assembly workers": "Assembly",
+    "Vehicle drivers and mobile equipment operators": "Drivers/Operators",
+    "Unskilled workers in agriculture, animal production, fisheries and forestry": "Unskilled Agriculture",
+    "Unskilled workers in extractive industry, construction, manufacturing and transport": "Unskilled Industry",
+    "Meal preparation assistants": "Meal Prep",
+    "Street vendors (except food) and street service providers": "Street Vendors"
+};
+
+const qualificationShortLabels = {
+    "Higher Education - Doctorate (3rd cycle)": "PhD (3rd cycle)",
+    "Higher Education - Doctorate": "PhD",
+    "Higher Education - Master (2nd cycle)": "Master (2nd)",
+    "Higher Education - Master's": "Master",
+    "Higher Education - Degree": "Degree",
+    "Higher education - degree (1st cycle)": "Degree (1st)",
+    "Higher Education - Bachelor's Degree": "Bachelor",
+    "Specialized higher studies course": "Specialized",
+    "Professional higher technical course": "Prof. Tech.",
+    "Technological specialization course": "Tech. Spec.",
+    "Technical-professional course": "Tech. Prof.",
+    "Frequency of Higher Education": "Some Higher Ed.",
+    "General commerce course": "Commerce",
+    "Secondary Education - 12th Year of Schooling or Eq.": "12th Grade",
+    "12th Year of Schooling - Not Completed": "12th Not Comp.",
+    "Other - 11th Year of Schooling": "Other 11th",
+    "11th Year of Schooling - Not Completed": "11th Not Comp.",
+    "Basic Education 3rd Cycle (9th/10th/11th Year) or Equiv.": "9th-11th",
+    "10th Year of Schooling": "10th Grade",
+    "9th Year of Schooling - Not Completed": "9th Not Comp.",
+    "8th year of schooling": "8th Grade",
+    "7th Year (Old)": "7th (Old)",
+    "7th year of schooling": "7th Grade",
+    "Basic Education 2nd Cycle (6th/7th/8th Year) or Equiv.": "6th-8th",
+    "2nd cycle of the general high school course": "2nd Cycle HS",
+    "Basic education 1st cycle (4th/5th year) or equiv.": "4th-5th",
+    "Can read without having a 4th year of schooling": "Reads, <4th",
+    "Can't read or write": "Illiterate",
+    "Unknown": "Unknown"
 };
 
 // Helper to count occurrences in an array
@@ -164,6 +302,7 @@ function motherQuals(data, expanded = false, containerElement = null) {
         "Can't read or write",
         "Unknown",
     ];
+    //process data with regards to dropout proportion
     const proportionData = countProportions(data, "Mother's qualification");
     const orderedArr = ordering.map((orderKey) => {
         const value = proportionData[orderKey];
@@ -171,6 +310,12 @@ function motherQuals(data, expanded = false, containerElement = null) {
         return { key: orderKey, ...value };
     });
     console.log("orderedArr", orderedArr);
+
+    //Shorten the labels
+    const orderedArrWithShortLabels = orderedArr.map(d => ({
+    ...d,
+    key: qualificationShortLabels[d.key] 
+    }));
 
     // Draw chart and swap button
     function render() {
@@ -221,7 +366,7 @@ function motherQuals(data, expanded = false, containerElement = null) {
             );
         } else {
             drawBarChart(
-                orderedArr,
+                orderedArrWithShortLabels,
                 svgElement,
                 "Mother's Qualification vs Dropout Rate",
                 expanded
@@ -308,6 +453,11 @@ function fatherQuals(data, expanded = false, containerElement = null) {
     });
     console.log("orderedArr", orderedArr);
 
+    //Shorten the labels
+    const orderedArrWithShortLabels = orderedArr.map(d => ({
+    ...d,
+    key: qualificationShortLabels[d.key] 
+    }));
     // Draw chart and swap button
     function render() {
         const containerSelection =
@@ -356,7 +506,7 @@ function fatherQuals(data, expanded = false, containerElement = null) {
             );
         } else {
             drawBarChart(
-                orderedArr,
+                orderedArrWithShortLabels,
                 svgElement,
                 "Father's Qualification vs Dropout Rate",
                 expanded
@@ -367,6 +517,12 @@ function fatherQuals(data, expanded = false, containerElement = null) {
     render();
 }
 
+
+/**
+ *  Translate the job code to readable text
+ * @param {Int} code - Int
+ * @returns 
+ */
 function translateJobCode(code) {
     const jobMap = {
         0: "Student",
@@ -404,6 +560,7 @@ function translateJobCode(code) {
     };
     return jobMap[Number(code)] || "Unknown code";
 }
+
 
 // Global variable to hold what chart to show
 let motherJobChartType = "bar";
@@ -551,6 +708,170 @@ function motherJob(data, expanded = false, containerElement = null) {
 
     render();
 }
+// Global variable to hold what chart to show
+let fatherJobChartType = "bar";
+
+/**
+ * Function to build all static visualizations for the father's occupation.
+ * Renders a pie chart of the distribution of father's occupation and a bar chart.
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ */
+function fatherJob(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Extract and map data from codes to readable labels
+    const fatherJobs = data.map((d) =>
+        translateJobCode(d["Father's occupation"])
+    );
+    const counts = countOccurrences(fatherJobs);
+
+    // Count up each of the occupations
+    const jobCountsArray = Object.entries(counts).map(([key, count]) => ({
+        key,
+        count,
+    }));
+
+    // Process data to consolidate small slices
+    const processedData = consolidateSmallSlices(jobCountsArray, 40);
+    console.log("processedData", processedData);
+
+    // Establish ordering for bar chart
+        const ordering = [
+        "Student",
+        "Representatives of the Legislative Power and Executive Bodies, Directors, Directors and Executive Managers",
+        "Specialists in Intellectual and Scientific Activities",
+        "Intermediate Level Technicians and Professions",
+        "Administrative staff",
+        "Personal Services, Security and Safety Workers and Sellers",
+        "Farmers and Skilled Workers in Agriculture, Fisheries and Forestry",
+        "Skilled Workers in Industry, Construction and Craftsmen",
+        "Installation and Machine Operators and Assembly Workers",
+        "Unskilled Workers",
+        "Armed Forces Professions",
+        "Other Situation",
+        "(blank)",
+        "Armed Forces Officers",
+        "Armed Forces Sergeants",
+        "Other Armed Forces personnel",
+        "Directors of administrative and commercial services",
+        "Hotel, catering, trade and other services directors",
+        "Specialists in the physical sciences, mathematics, engineering and related techniques",
+        "Health professionals",
+        "teachers",
+        "Specialists in finance, accounting, administrative organization, public and commercial relations",
+        "Intermediate level science and engineering technicians and professions",
+        "Technicians and professionals, of intermediate level of health",
+        "Intermediate level technicians from legal, social, sports, cultural and similar services",
+        "Information and communication technology technicians",
+        "Office workers, secretaries in general and data processing operators",
+        "Data, accounting, statistical, financial services and registry-related operators",
+        "Other administrative support staff",
+        "personal service workers",
+        "sellers",
+        "Personal care workers and the like",
+        "Protection and security services personnel",
+        "Market-oriented farmers and skilled agricultural and animal production workers",
+        "Farmers, livestock keepers, fishermen, hunters and gatherers, subsistence",
+        "Skilled construction workers and the like, except electricians",
+        "Skilled workers in metallurgy, metalworking and similar",
+        "Skilled workers in electricity and electronics",
+        "Workers in food processing, woodworking, clothing and other industries and crafts",
+        "Fixed plant and machine operators",
+        "assembly workers",
+        "Vehicle drivers and mobile equipment operators",
+        "Unskilled workers in agriculture, animal production, fisheries and forestry",
+        "Unskilled workers in extractive industry, construction, manufacturing and transport",
+        "Meal preparation assistants",
+        "Street vendors (except food) and street service providers",
+        "Unknown code"
+    ];
+    const proportionData = countProportions(data, "Father's occupation");
+    console.log("proportionData", proportionData);
+    const orderedArr = ordering
+        .map((orderKey) => {
+            const value = proportionData[orderKey];
+            if (value === undefined) return null;
+            return { key: orderKey, ...value };
+        })
+        .filter((d) => d !== null);
+    console.log("orderedArr", orderedArr);
+
+    const orderedArrWithShortLabels = orderedArr.map(d => ({
+    ...d,
+    key: fatherJobShortLabels[d.key] 
+    }));
+
+    console.log("orderedArrWithShortLabels", orderedArrWithShortLabels);
+    // Draw chart and swap button
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+        containerSelection.selectAll("#pie-btn, #bar-btn").remove();
+
+         containerSelection
+            .append("button")
+            .attr("id", "bar-btn")
+            .text("1")
+            .style("margin-right", "8px")
+            .on("click", () => {
+                fatherJobChartType = "bar";
+                render();
+            });
+
+        containerSelection
+            .append("button")
+            .attr("id", "pie-btn")
+            .text("2")
+            .on("click", () => {
+                fatherJobChartType = "pie";
+                render();
+            });
+
+        // Ensure SVG exists before drawing
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        // Chart
+        if (fatherJobChartType === "pie") {
+            drawPiChart(
+                processedData,
+                svgElement,
+                showDrilldownChart,
+                "Father's Occupation Distribution",
+                expanded
+            );
+        } else {
+            console.log("drawing bar chart");
+            drawBarChart(
+                orderedArrWithShortLabels,
+                svgElement,
+                "Father's Occupation vs Dropout Rate",
+                expanded
+            );
+        }
+    }
+
+    render();
+}
+
+
 
 /**
  * Helper function to consolidate slices below threshold into one "other" slice.
@@ -871,6 +1192,8 @@ function countProportions(data, factor) {
             key = translateEducationCode(key);
         } else if (factor === "Mother's occupation") {
             key = translateJobCode(key);
+        } else if(factor == "Father's occupation") {
+            key = translateFatherJobCode(key);
         }
         const status = d.Target;
         if (!result[key]) {
@@ -909,12 +1232,12 @@ function drawBarChart(data, svg_id_or_element, title, expanded = false) {
         margin = { top: 150, right: 200, bottom: 250, left: 180 };
         width = 1800 - margin.left - margin.right;
         height = 900 - margin.top - margin.bottom;
-        labelFontSize = "12px";
+        labelFontSize = "18px";
     } else {
-        margin = { top: 200, right: 215, bottom: 250, left: 100 };
-        width = 900 - margin.left - margin.right;
-        height = 900 - margin.top - margin.bottom;
-        labelFontSize = "14px";
+        margin = { top: 200, right: 170, bottom: 250, left: 100 };
+        width = 1200 - margin.left - margin.right;
+        height = 1000 - margin.top - margin.bottom;
+        labelFontSize = "16px";
     }
 
     // Prepare the labels and datasets
@@ -1120,7 +1443,7 @@ function drawBarChart(data, svg_id_or_element, title, expanded = false) {
             return y(maxVal) - 10;
         })
         .attr("text-anchor", "middle")
-        .attr("font-size", expanded ? "22px" : "12px")
+        .attr("font-size", expanded ? "8px" : "10px")
         .attr("fill", "#222")
         .text(function (d) {
             return "n=" + d.total;

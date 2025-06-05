@@ -10,7 +10,7 @@ import {
     loadGradeData,
     getRawDataForTwoColumns,
 } from "./dataLoader.js";
-import { motherQuals, fatherQuals, motherJob } from "./csawStatVis.js";
+import { motherQuals, fatherQuals, motherJob, fatherJob } from "./csawStatVis.js";
 
 let currentSlide = 0;
 const slides = d3.selectAll(".slide");
@@ -98,6 +98,7 @@ const chartFunctions = {
     "Mother's qualification": motherQuals,
     "Father's qualification": fatherQuals,
     "Mother's occupation": motherJob,
+    "Father's occupation": fatherJob,
     // Add more mappings as needed
 };
 
