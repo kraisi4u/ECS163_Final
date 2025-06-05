@@ -367,6 +367,51 @@ function translateGenderCode(code) {
     return codeMap[Number(code)] || "Other";
 }
 
+/**
+ * Translate the marital status code to readable text
+ * @param {number|string} code
+ * @returns {string}
+ */
+function translateMaritalStatus(code) {
+    const codeMap = {
+        1: "Single",
+        2: "Married",
+        3: "Widower",
+        4: "Divorced",
+        5: "Facto Union",
+        6: "Legally Separated"
+    };
+    return codeMap[Number(code)] || "Unknown";
+}
+
+/**
+ * Translate the course code to readable text
+ * @param {number|string} code
+ * @returns {string}
+ */
+function translateCourseCode(code) {
+    const codeMap = {
+        33: "Biofuel Production Technologies",
+        171: "Animation and Multimedia Design",
+        8014: "Social Service (evening attendance)",
+        9003: "Agronomy",
+        9070: "Communication Design",
+        9085: "Veterinary Nursing",
+        9119: "Informatics Engineering",
+        9130: "Equinculture",
+        9147: "Management",
+        9238: "Social Service",
+        9254: "Tourism",
+        9500: "Nursing",
+        9556: "Oral Hygiene",
+        9670: "Advertising and Marketing Management",
+        9773: "Journalism and Communication",
+        9853: "Basic Education",
+        9991: "Management (evening attendance)"
+    };
+    return codeMap[Number(code)] || "Unknown";
+}
+
 export {
     translateEducationCode,
     translateFatherJobCode,
@@ -378,5 +423,7 @@ export {
     translateYesNo,
     translatePreviousQualification,
     translateAttendanceSection,
-    translateGenderCode
+    translateGenderCode,
+    translateMaritalStatus,
+    translateCourseCode,
 };

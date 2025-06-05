@@ -320,7 +320,7 @@ function countProportions(data, factor) {
     const result = {};
     data.forEach((d) => {
         let key = d[factor];
-        // translate key based on code
+        // Legacy code, early versions of code had translation handled here instead of before 
         if (
             factor === "Mother's qualification" ||
             factor === "Father's qualification"
@@ -643,7 +643,7 @@ function drawBox(data, svg, expanded) {
         height = 800;
     }else{
         width = 1000;
-        height = 600;
+        height = 1000;
     }
 
     svg.selectAll("*").remove();
@@ -697,7 +697,7 @@ function drawBox(data, svg, expanded) {
                 .text("Distribution of Previous qualification (grade) and Admission grade")
         )
     gTitle.selectAll("text")
-        .style("font-size", "32px")
+        .style("font-size", expanded ? "32px" : "20px")
         .style("font-weight", "bold")
 
     // function that return 5 numbers of a dataset.

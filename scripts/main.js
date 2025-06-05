@@ -29,6 +29,9 @@ import {
     genderBar,
     admissionGradeDistribution,
     scatterOf3,
+    maritalStatusBar,
+    displacedStatusBar,
+    courseBar
 
 } from "./staticVizFunctions.js";
 
@@ -135,6 +138,9 @@ const chartFunctions = {
     "Gender": genderBar,
     "Previous qualification (grade)": admissionGradeDistribution,
     "Admission grade": scatterOf3,
+    "Marital status": maritalStatusBar,
+    "Displaced": displacedStatusBar,
+    "Course": courseBar,
 };
 
 /**

@@ -22,7 +22,9 @@ import { //functions to translate int codes to human readable labels
     translateYesNo,
     translatePreviousQualification,
     translateAttendanceSection,
-    translateGenderCode
+    translateGenderCode,
+    translateMaritalStatus,
+    translateCourseCode,
 } from "./translations.js";
  
 
@@ -1642,6 +1644,222 @@ function genderBar(data, expanded = false, containerElement = null) {
     render();
 }
 
+/**
+ * Build static bar chart for marital status vs dropout rate
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
+function maritalStatusBar(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Extract and map data (translate codes to readable strings)
+    const statuses = data.map(d => translateMaritalStatus(d["Marital status"]));
+    const counts = countOccurrences(statuses);
+
+    // Remap data with translated keys for countProportions
+    const translatedData = data.map(d => ({
+        ...d,
+        "Marital status": translateMaritalStatus(d["Marital status"])
+    }));
+    const proportionData = countProportions(translatedData, "Marital status");
+
+    // Order by code mapping
+    const ordering = [
+        "Single",
+        "Married",
+        "Widower",
+        "Divorced",
+        "Facto Union",
+        "Legally Separated"
+    ].filter(k => counts[k] !== undefined);
+
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "Marital Status vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
+
+/**
+ * Build static bar chart for displaced status vs dropout rate
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
+function displacedStatusBar(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Extract and map data (translate codes to Yes/No)
+    const statuses = data.map(d => translateYesNo(d["Displaced"]));
+    const counts = countOccurrences(statuses);
+
+    // Remap data with translated keys for countProportions
+    const translatedData = data.map(d => ({
+        ...d,
+        "Displaced": translateYesNo(d["Displaced"])
+    }));
+    const proportionData = countProportions(translatedData, "Displaced");
+
+    // Order by Yes/No (Yes first, then No, then Unknown)
+    const ordering = ["Yes", "No", "Unknown"].filter(k => counts[k] !== undefined);
+
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "Displaced Status vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
+
+/**
+ * Build static bar chart for course vs dropout rate
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
+ */
+function courseBar(data, expanded = false, containerElement = null) {
+    // Set container and svg_id based on expanded
+    let container;
+    if (expanded) {
+        container = "#overlay-chart-container";
+    } else if (containerElement) {
+        container = d3.select(containerElement);
+    } else {
+        container = ".side-chart";
+    }
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    // Extract and map data (translate codes to course names)
+    const courses = data.map(d => translateCourseCode(d["Course"]));
+    const counts = countOccurrences(courses);
+
+    // Remap data with translated keys for countProportions
+    const translatedData = data.map(d => ({
+        ...d,
+        "Course": translateCourseCode(d["Course"])
+    }));
+    const proportionData = countProportions(translatedData, "Course");
+
+    // Order by the order in the mapping above
+    const ordering = [
+        "Biofuel Production Technologies",
+        "Animation and Multimedia Design",
+        "Social Service (evening attendance)",
+        "Agronomy",
+        "Communication Design",
+        "Veterinary Nursing",
+        "Informatics Engineering",
+        "Equinculture",
+        "Management",
+        "Social Service",
+        "Tourism",
+        "Nursing",
+        "Oral Hygiene",
+        "Advertising and Marketing Management",
+        "Journalism and Communication",
+        "Basic Education",
+        "Management (evening attendance)"
+    ].filter(k => counts[k] !== undefined);
+
+    const orderedArr = ordering.map(orderKey => {
+        const value = proportionData[orderKey];
+        if (value === undefined) return null;
+        return { key: orderKey, ...value };
+    }).filter(d => d !== null);
+
+    // Draw the bar chart
+    function render() {
+        const containerSelection =
+            typeof container === "string" ? d3.select(container) : container;
+        containerSelection.selectAll("svg").remove();
+
+        let svgElement;
+        if (containerSelection.select(svg_id).empty()) {
+            svgElement = containerSelection
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        } else {
+            svgElement = containerSelection.select(svg_id);
+        }
+
+        drawBarChart(
+            orderedArr,
+            svgElement,
+            "Course vs Dropout Rate",
+            expanded
+        );
+    }
+
+    render();
+}
 
 export {
     motherQuals,
@@ -1663,4 +1881,7 @@ export {
     genderBar,
     admissionGradeDistribution,
     scatterOf3,
+    maritalStatusBar,
+    displacedStatusBar,
+    courseBar
 };
