@@ -10,7 +10,7 @@ import {
     loadGradeData,
     getRawDataForTwoColumns,
 } from "./dataLoader.js";
-import { motherQuals, fatherQuals } from "./csawStatVis.js";
+import { motherQuals, fatherQuals, motherJob } from "./csawStatVis.js";
 
 let currentSlide = 0;
 const slides = d3.selectAll(".slide");
@@ -97,6 +97,7 @@ const updateVerticalTitle = (htmlSlideIndex) => {
 const chartFunctions = {
     "Mother's qualification": motherQuals,
     "Father's qualification": fatherQuals,
+    "Mother's occupation": motherJob,
     // Add more mappings as needed
 };
 
@@ -114,7 +115,7 @@ const showStaticViz = (currentSlideElement) => {
     console.log("Chart function:", chartFunc);
     if (chartFunc) {
         //clear side chart
-        d3.select("#side-chart").selectAll("svg").remove();
+        d3.select("#side-chart").selectAll('*').remove();
 
         // Add expand button
         const sideChart = d3.select("#side-chart");
@@ -144,12 +145,9 @@ const showStaticViz = (currentSlideElement) => {
                 chartFunc(allCsvData, true);
             });
 
-        d3.select("#side-chart")
-            .append("svg")
-            .attr("id", "graph1")
-            .attr("width", 350)
-            .attr("height", 350);
+        setTimeout(() => {
         chartFunc(allCsvData);
+        }, 200);
     }
 };
 

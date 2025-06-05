@@ -4,7 +4,8 @@ export {
     drawPiChart,
     drawBarChart,
     translateEducationCode,
-    countProportions
+    countProportions,
+    motherJob
 };
 
 /**
@@ -59,7 +60,7 @@ function countOccurrences(arr) {
 }
 
 //declare global variable to hold what chart to show
-let motherQualsChartType = "pie";
+let motherQualsChartType = "bar";
 /**
  * Function to build all static visualizations for the mother's qualifications.
  * Currently will render a pi chart of the distribution of mother's qualification and a bar chart  
@@ -135,18 +136,19 @@ function motherQuals(data, expanded = false){
         d3.select(container).selectAll("svg").remove();
         d3.select(container).selectAll("#pie-btn, #bar-btn").remove();
         // Buttons
-        d3.select(container)
-            .append("button")
-            .attr("id", "pie-btn")
-            .text("1")
-            .style("margin-right", "8px")
-            .on("click", () => { motherQualsChartType = "pie"; render(); });
-
+        
         d3.select(container)
             .append("button")
             .attr("id", "bar-btn")
-            .text("2")
+            .text("1")
+            .style("margin-right", "8px")
             .on("click", () => { motherQualsChartType = "bar"; render(); });
+
+        d3.select(container)
+            .append("button")
+            .attr("id", "pie-btn")
+            .text("2")
+            .on("click", () => { motherQualsChartType = "pie"; render(); });
 
         // Ensure SVG exists before drawing
         if (d3.select(container).select(svg_id).empty()) {
@@ -168,37 +170,36 @@ function motherQuals(data, expanded = false){
     render();
 
     
-    
-
-    
-    //draw bar chart
-    //drawBarChart(orderedArr, "#graph1", cordX, cordY, "Mother's Qualification vs Dropout Rate");
 }
      
 
+//declare global variable to hold what chart to show
+let fatherQualsChartType = "bar";
 /**
  * Function to build all static visualizations for the father's qualifications.
  * @param data {csv object} raw dataset to draw from
  */
 function fatherQuals(data, expanded = false){
+    // Set container and svg_id based on expanded
+    const container = expanded ? "#overlay-chart-container" : "#side-chart";
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+    //Process data 
+
+    //extract and map data from codes to readble labels
     const fatherQuals = data.map(d => translateEducationCode(d["Father's qualification"]));
     const counts = countOccurrences(fatherQuals);
 
+    //count up each of the qualifications
     const qualCountsArray = Object.entries(counts).map(([key, count]) => ({
         key,
         count
     }));
     console.log("qualCountsArray", qualCountsArray);
 
+
     //process data to consolidate small slices
     const processedData = consolidateSmallSlices(qualCountsArray, 40)
-
-     if(expanded){
-        drawPiChart(processedData, '#graph1-expanded',showDrilldownChart, "Father's Qualifications Distribution", expanded);
-    } else { //draw regular version
-       drawPiChart(processedData, '#graph1',showDrilldownChart, "Father's Qualifications Distribution");
-    }
-    
 
     //Establish ordering of most qualified to least qualified to prepare data for bar chart
     const ordering = [
@@ -240,8 +241,214 @@ function fatherQuals(data, expanded = false){
         return { key: orderKey, ...value };
     })
     console.log("orderedArr", orderedArr);
-    //draw bar chart
-    //drawBarChart(orderedArr, "#graph1", cordX, cordY, "Father's Qualification vs Dropout Rate");
+
+    // Draw chart and swap button
+    function render() {
+        d3.select(container).selectAll("svg").remove();
+        d3.select(container).selectAll("#pie-btn, #bar-btn").remove();
+        // Buttons
+        d3.select(container)
+            .append("button")
+            .attr("id", "bar-btn")
+            .text("1")
+            .style("margin-right", "8px")
+            .on("click", () => { fatherQualsChartType = "bar"; render(); });
+
+        d3.select(container)
+            .append("button")
+            .attr("id", "pie-btn")
+            .text("2")
+            .on("click", () => { fatherQualsChartType = "pie"; render(); });
+
+        // Ensure SVG exists before drawing
+        if (d3.select(container).select(svg_id).empty()) {
+            d3.select(container)
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+}
+
+
+        // Chart
+        if (fatherQualsChartType === "pie") {
+            console.log("drawing pie chart");
+            drawPiChart(processedData, svg_id, showDrilldownChart, "Father's Qualifications Distribution", expanded);
+        } else {
+            drawBarChart(orderedArr, svg_id, "Father's Qualification vs Dropout Rate", expanded);
+        }
+    }
+
+    render();
+
+}
+
+
+
+function translateJobCode(code) {
+    const jobMap = {
+        0: "Student",
+        1: "Representatives of the Legislative Power and Executive Bodies, Directors, Directors and Executive Managers",
+        2: "Specialists in Intellectual and Scientific Activities",
+        3: "Intermediate Level Technicians and Professions",
+        4: "Administrative staff",
+        5: "Personal Services, Security and Safety Workers and Sellers",
+        6: "Farmers and Skilled Workers in Agriculture, Fisheries and Forestry",
+        7: "Skilled Workers in Industry, Construction and Craftsmen",
+        8: "Installation and Machine Operators and Assembly Workers",
+        9: "Unskilled Workers",
+        10: "Armed Forces Professions",
+        90: "Other Situation",
+        99: "(blank)",
+        122: "Health professionals",
+        123: "teachers",
+        125: "Specialists in information and communication technologies (ICT)",
+        131: "Intermediate level science and engineering technicians and professions",
+        132: "Technicians and professionals, of intermediate level of health",
+        134: "Intermediate level technicians from legal, social, sports, cultural and similar services",
+        141: "Office workers, secretaries in general and data processing operators",
+        143: "Data, accounting, statistical, financial services and registry-related operators",
+        144: "Other administrative support staff",
+        151: "personal service workers",
+        152: "sellers",
+        153: "Personal care workers and the like",
+        171: "Skilled construction workers and the like, except electricians",
+        173: "Skilled workers in printing, precision instrument manufacturing, jewelers, artisans and the like",
+        175: "Workers in food processing, woodworking, clothing and other industries and crafts",
+        191: "cleaning workers",
+        192: "Unskilled workers in agriculture, animal production, fisheries and forestry",
+        193: "Unskilled workers in extractive industry, construction, manufacturing and transport",
+        194: "Meal preparation assistants"
+    };
+    return jobMap[Number(code)] || "Unknown code";
+}
+
+
+// Global variable to hold what chart to show
+let motherJobChartType = "pie";
+/**
+ * Function to build all static visualizations for the mother's occupation.
+ * Renders a pie chart of the distribution of mother's occupation and a bar chart.
+ * @param {Array} data - raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ */
+function motherJob(data, expanded = false) {
+    // Set container and svg_id based on expanded
+    const container = expanded ? "#overlay-chart-container" : "#side-chart";
+    const svg_id = expanded ? "#graph1-expanded" : "#graph1";
+
+
+
+
+    // Extract and map data from codes to readable labels
+    const motherJobs = data.map(d => translateJobCode(d["Mother's occupation"]));
+    const counts = countOccurrences(motherJobs);
+
+    // Count up each of the occupations
+    const jobCountsArray = Object.entries(counts).map(([key, count]) => ({
+        key,
+        count
+    }));
+
+    // Process data to consolidate small slices
+    const processedData = consolidateSmallSlices(jobCountsArray, 40);
+    console.log("processedData", processedData);
+
+    // Establish ordering for bar chart 
+    const ordering = [
+         "Student",
+         "Representatives of the Legislative Power and Executive Bodies, Directors, Directors and Executive Managers",
+         "Specialists in Intellectual and Scientific Activities",
+         "Intermediate Level Technicians and Professions",
+         "Administrative staff",
+         "Personal Services, Security and Safety Workers and Sellers",
+         "Farmers and Skilled Workers in Agriculture, Fisheries and Forestry",
+         "Skilled Workers in Industry, Construction and Craftsmen",
+         "Installation and Machine Operators and Assembly Workers",
+         "Unskilled Workers",
+         "Armed Forces Professions",
+         "Other Situation",
+         "(blank)",
+         "Health professionals",
+         "teachers",
+         "Specialists in information and communication technologies (ICT)",
+         "Intermediate level science and engineering technicians and professions",
+         "Technicians and professionals, of intermediate level of health",
+         "Intermediate level technicians from legal, social, sports, cultural and similar services",
+         "Office workers, secretaries in general and data processing operators",
+         "Data, accounting, statistical, financial services and registry-related operators",
+         "Other administrative support staff",
+         "personal service workers",
+         "sellers",
+         "Personal care workers and the like",
+         "Skilled construction workers and the like, except electricians",
+         "Skilled workers in printing, precision instrument manufacturing, jewelers, artisans and the like",
+         "Workers in food processing, woodworking, clothing and other industries and crafts",
+         "cleaning workers",
+         "Unskilled workers in agriculture, animal production, fisheries and forestry",
+       "Unskilled workers in extractive industry, construction, manufacturing and transport",
+        "Unknown code"
+    ];
+    const proportionData = countProportions(data, "Mother's occupation");
+    console.log("proportionData", proportionData);
+    const orderedArr = ordering
+        .map(orderKey => {
+            const value = proportionData[orderKey];
+            if (value === undefined) return null;
+            return { key: orderKey, ...value };
+        })
+        .filter(d => d !== null);
+    console.log("orderedArr", orderedArr);
+    // Draw chart and swap button
+    function render() {
+        d3.select(container).selectAll("svg").remove();
+        d3.select(container).selectAll("#pie-btn, #bar-btn").remove();
+
+        // Buttons
+        const btnStyle = `
+            width: 120px;
+            height: 38px;
+            font-size: ${expanded ? "16px" : "14px"};
+            padding: 4px 12px;
+            margin-bottom: 8px;
+            margin-right: 8px;
+            border-radius: 6px;
+            border: 1px solid #aaa;
+            background: #f8f8f8;
+            cursor: pointer;
+            display: inline-block;
+            box-sizing: border-box;
+        `;
+
+        d3.select(container)
+            .append("button")
+            .attr("id", "bar-btn")
+            .attr("style", btnStyle)
+            .text("Bar Chart")
+            .on("click", () => { motherJobChartType = "bar"; render(); });
+
+        d3.select(container)
+            .append("button")
+            .attr("id", "pie-btn")
+            .attr("style", btnStyle)
+            .text("Pie Chart")
+            .on("click", () => { motherJobChartType = "pie"; render(); });
+
+        // Ensure SVG exists before drawing
+        if (d3.select(container).select(svg_id).empty()) {
+            d3.select(container)
+                .append("svg")
+                .attr("id", svg_id.replace("#", ""));
+        }
+
+        // Chart
+        if (motherJobChartType === "pie") {
+            drawPiChart(processedData, svg_id, showDrilldownChart, "Mother's Occupation Distribution", expanded);
+        } else {
+            console.log("drawing bar chart");
+            drawBarChart(orderedArr, svg_id, "Mother's Occupation vs Dropout Rate", expanded);
+        }
+    }
+
+    render();
 }
 
 /**
@@ -523,11 +730,12 @@ function drawPiChart(data, svg_id, onOtherClick, title, expanded = false) {
 function countProportions(data, factor) {
     const result = {};
     data.forEach(d => {
-        
         let key = d[factor];
-        //translate key based on code
-        if(factor === "Mother's qualification"  || factor === "Father's qualification") {
-            key = translateEducationCode(key); // Use translated code as key
+        // translate key based on code
+        if (factor === "Mother's qualification" || factor === "Father's qualification") {
+            key = translateEducationCode(key);
+        } else if (factor === "Mother's occupation") {
+            key = translateJobCode(key);
         }
         const status = d.Target;
         if (!result[key]) {
@@ -596,11 +804,12 @@ function drawBarChart(data, svg_id, title, expanded = false) {
         .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
         .attr("style", "max-width: 100%; height: auto; background-color:rgb(255, 255, 255)");
 
+    
     // Main group for chart content (this is what will be panned)
     var chartGroup = svg.append("g")
         .attr("class", "chart-content")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
+    
     // X axis
     var x0 = d3.scaleBand()
         .domain(labels)
