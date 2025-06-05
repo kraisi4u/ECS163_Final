@@ -48,6 +48,43 @@ function translateEducationCode(code) {
     return codeMap[Number(code)] || "Unknown code";
 }
 
+//shortened labels for rendering in charts
+const jobShortLabels = {
+    "Student": "Student",
+    "Representatives of the Legislative Power and Executive Bodies, Directors, Directors and Executive Managers": "Executives",
+    "Specialists in Intellectual and Scientific Activities": "Scientists",
+    "Intermediate Level Technicians and Professions": "Technicians",
+    "Administrative staff": "Admin",
+    "Personal Services, Security and Safety Workers and Sellers": "Service/Security/Sales",
+    "Farmers and Skilled Workers in Agriculture, Fisheries and Forestry": "Farmers",
+    "Skilled Workers in Industry, Construction and Craftsmen": "Industry/Construction",
+    "Installation and Machine Operators and Assembly Workers": "Machine Operators",
+    "Unskilled Workers": "Unskilled",
+    "Armed Forces Professions": "Military",
+    "Other Situation": "Other",
+    "(blank)": "(blank)",
+    "Health professionals": "Health",
+    "teachers": "Teachers",
+    "Specialists in information and communication technologies (ICT)": "ICT",
+    "Intermediate level science and engineering technicians and professions": "Sci/Eng Techs",
+    "Technicians and professionals, of intermediate level of health": "Health Techs",
+    "Intermediate level technicians from legal, social, sports, cultural and similar services": "Legal/Social/Sports Techs",
+    "Office workers, secretaries in general and data processing operators": "Office/Data",
+    "Data, accounting, statistical, financial services and registry-related operators": "Finance/Registry",
+    "Other administrative support staff": "Other Admin",
+    "personal service workers": "Service Workers",
+    "sellers": "Sellers",
+    "Personal care workers and the like": "Care Workers",
+    "Skilled construction workers and the like, except electricians": "Construction",
+    "Skilled workers in printing, precision instrument manufacturing, jewelers, artisans and the like": "Printing/Artisans",
+    "Workers in food processing, woodworking, clothing and other industries and crafts": "Food/Wood/Clothing",
+    "cleaning workers": "Cleaning",
+    "Unskilled workers in agriculture, animal production, fisheries and forestry": "Unskilled Agriculture",
+    "Unskilled workers in extractive industry, construction, manufacturing and transport": "Unskilled Industry",
+    "Unknown code": "Unknown",
+    "Other": "Other" // for consolidated slices
+};
+
 // Helper to count occurrences in an array
 function countOccurrences(arr) {
     const counts = {};
@@ -369,7 +406,7 @@ function translateJobCode(code) {
 }
 
 // Global variable to hold what chart to show
-let motherJobChartType = "pie";
+let motherJobChartType = "bar";
 /**
  * Function to build all static visualizations for the mother's occupation.
  * Renders a pie chart of the distribution of mother's occupation and a bar chart.
@@ -449,6 +486,13 @@ function motherJob(data, expanded = false, containerElement = null) {
         })
         .filter((d) => d !== null);
     console.log("orderedArr", orderedArr);
+
+    const orderedArrWithShortLabels = orderedArr.map(d => ({
+    ...d,
+    key: jobShortLabels[d.key] 
+    }));
+
+    console.log("orderedArrWithShortLabels", orderedArrWithShortLabels);
     // Draw chart and swap button
     function render() {
         const containerSelection =
@@ -456,27 +500,11 @@ function motherJob(data, expanded = false, containerElement = null) {
         containerSelection.selectAll("svg").remove();
         containerSelection.selectAll("#pie-btn, #bar-btn").remove();
 
-        // Buttons
-        const btnStyle = `
-            width: 120px;
-            height: 38px;
-            font-size: ${expanded ? "16px" : "14px"};
-            padding: 4px 12px;
-            margin-bottom: 8px;
-            margin-right: 8px;
-            border-radius: 6px;
-            border: 1px solid #aaa;
-            background: #f8f8f8;
-            cursor: pointer;
-            display: inline-block;
-            box-sizing: border-box;
-        `;
-
-        containerSelection
+         containerSelection
             .append("button")
             .attr("id", "bar-btn")
-            .attr("style", btnStyle)
-            .text("Bar Chart")
+            .text("1")
+            .style("margin-right", "8px")
             .on("click", () => {
                 motherJobChartType = "bar";
                 render();
@@ -485,8 +513,7 @@ function motherJob(data, expanded = false, containerElement = null) {
         containerSelection
             .append("button")
             .attr("id", "pie-btn")
-            .attr("style", btnStyle)
-            .text("Pie Chart")
+            .text("2")
             .on("click", () => {
                 motherJobChartType = "pie";
                 render();
@@ -514,7 +541,7 @@ function motherJob(data, expanded = false, containerElement = null) {
         } else {
             console.log("drawing bar chart");
             drawBarChart(
-                orderedArr,
+                orderedArrWithShortLabels,
                 svgElement,
                 "Mother's Occupation vs Dropout Rate",
                 expanded
@@ -559,21 +586,27 @@ function consolidateSmallSlices(data, threshold) {
  * @param {String} svg_id  - id of svg to draw at
  * @param {String} ogTitle - Original title of the chart
  */
-function showDrilldownChart(data, svg_id, ogTitle, expanded = false) {
+function showDrilldownChart(data, svg_id_or_element, ogTitle, expanded = false) {
     console.log("drill called");
     const otherSlice = data.find((d) => d.key === "Other");
     if (!otherSlice || !otherSlice._otherData) {
         console.error("No _otherData found for label:Other", data);
         return;
     }
+
+    // Always use a D3 selection for the SVG
+    const svg = typeof svg_id_or_element === "string"
+        ? d3.select(svg_id_or_element)
+        : svg_id_or_element;
+
     if (expanded) {
-        drawPiChart(otherSlice._otherData, svg_id, null, "Other", expanded);
+        drawPiChart(otherSlice._otherData, svg, null, "Other", expanded);
     } else {
-        drawPiChart(otherSlice._otherData, svg_id, null, "Other");
+        drawPiChart(otherSlice._otherData, svg, null, "Other");
     }
+
     // Add a Back button (optional)
-    d3.select(svg_id)
-        .append("text")
+    svg.append("text")
         .attr("x", 20)
         .attr("y", 30)
         .attr("fill", "blue")
@@ -581,17 +614,16 @@ function showDrilldownChart(data, svg_id, ogTitle, expanded = false) {
         .style("cursor", "pointer")
         .text("← Back")
         .on("click", function () {
-            console.log(data);
             if (expanded) {
                 drawPiChart(
                     data,
-                    svg_id,
+                    svg,
                     showDrilldownChart,
                     ogTitle,
                     expanded
                 );
             } else {
-                drawPiChart(data, svg_id, showDrilldownChart, ogTitle);
+                drawPiChart(data, svg, showDrilldownChart, ogTitle);
             }
         });
 }
@@ -874,7 +906,7 @@ function drawBarChart(data, svg_id_or_element, title, expanded = false) {
     // Set up SVG dimensions and margins based on expanded
     let margin, width, height, labelFontSize;
     if (expanded) {
-        margin = { top: 150, right: 200, bottom: 220, left: 180 };
+        margin = { top: 150, right: 200, bottom: 250, left: 180 };
         width = 1800 - margin.left - margin.right;
         height = 900 - margin.top - margin.bottom;
         labelFontSize = "12px";

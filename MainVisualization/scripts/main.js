@@ -147,9 +147,9 @@ const showStaticViz = (currentSlideElement) => {
                 chartFunc(allCsvData, true, null);
             });
 
-        setTimeout(() => {
+        
             chartFunc(allCsvData, false, sideChart.node());
-        }, 200);
+        
     }
 };
 
