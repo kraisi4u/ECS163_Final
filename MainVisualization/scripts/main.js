@@ -20,7 +20,12 @@ import {
     internationalStatusBar,
     tuitionPaymentStatusBar,
     debtorStatusBar,
-    previousQualificationBar
+    previousQualificationBar,
+    specialNeedsStatusBar,
+    attendanceSectionStatusBar,
+    ageEnrollmentBar,
+    scholarshipStatusBar,
+    gdpRateBar
 
 } from "./staticVizFunctions.js";
 
@@ -119,6 +124,11 @@ const chartFunctions = {
     "Debtor": debtorStatusBar,
     "Previous qualification": previousQualificationBar,
     // Add more mappings as needed
+    "Educational special needs": specialNeedsStatusBar,
+    "Daytime/evening attendance": attendanceSectionStatusBar,
+    "Age at enrollment": ageEnrollmentBar,
+    "Scholarship holder": scholarshipStatusBar,
+    "GDP": gdpRateBar
 };
 
 /**

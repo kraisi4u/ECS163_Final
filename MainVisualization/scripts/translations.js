@@ -337,6 +337,22 @@ function translatePreviousQualification(code) {
     };
     return codeMap[Number(code)] || "Other";
 }
+
+/**
+ * Translate a daytime/evening code or value to readable text
+ * @param {string|number} value - the value to translate (e.g., "1", "0", 1, 0, etc.)
+ * @returns {string} - "Daytime", "Evening", or "Unknown"
+ */
+function translateAttendanceSection(value) {
+    if (value === 1 || value === "1") {
+        return "Daytime";
+    }
+    if (value === 0 || value === "0") {
+        return "Evening";
+    }
+    return "Unknown";
+}
+
 export {
     translateEducationCode,
     translateFatherJobCode,
@@ -346,5 +362,6 @@ export {
     translateJobCode,
     translateNationalityCode,
     translateYesNo,
-    translatePreviousQualification
+    translatePreviousQualification,
+    translateAttendanceSection
 };
