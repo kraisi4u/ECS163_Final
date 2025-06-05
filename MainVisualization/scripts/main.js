@@ -10,7 +10,7 @@ import {
     loadGradeData,
     getRawDataForTwoColumns,
 } from "./dataLoader.js";
-import { motherQuals, fatherQuals, motherJob, fatherJob } from "./staticVizFunctions.js";
+import { motherQuals, fatherQuals, motherJob, fatherJob, unemploymentRateBar} from "./staticVizFunctions.js";
 
 let currentSlide = 0;
 const slides = d3.selectAll(".slide");
@@ -99,6 +99,7 @@ const chartFunctions = {
     "Father's qualification": fatherQuals,
     "Mother's occupation": motherJob,
     "Father's occupation": fatherJob,
+    "Unemployment rate": unemploymentRateBar,
     // Add more mappings as needed
 };
 
