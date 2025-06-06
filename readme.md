@@ -56,6 +56,8 @@ For slides with small (static) visualizations on the left side, users can click 
 
 Some static visualization have additional buttons to change between alternative static visualizations.
 
+Firefox is prefered as we encountered issues with things not rendering correctly on chrome for some reason
+
 ## Credits
 
 ECS 163 Team 16 - Best Group Plus Ultra Beyond
