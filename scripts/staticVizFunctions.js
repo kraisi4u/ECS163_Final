@@ -49,6 +49,7 @@ let motherQualsChartType = "bar";
  * Currently will render a pi chart of the distribution of mother's qualification and a bar chart
  * @param {Array} data - raw dataset to draw from
  * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
  */
 function motherQuals(data, expanded = false, containerElement = null) {
     // Set container and svg_id based on expanded
@@ -191,7 +192,9 @@ function motherQuals(data, expanded = false, containerElement = null) {
 let fatherQualsChartType = "bar";
 /**
  * Function to build all static visualizations for the father's qualifications.
- * @param data {csv object} raw dataset to draw from
+ * @param {Array} data - csv object raw dataset to draw from
+ * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
  */
 function fatherQuals(data, expanded = false, containerElement = null) {
     // Set container and svg_id based on expanded
@@ -477,14 +480,15 @@ function motherJob(data, expanded = false, containerElement = null) {
 
     render();
 }
-// Global variable to hold what chart to show
-let fatherJobChartType = "bar";
 
+// Global variable to hold what chart to show first
+let fatherJobChartType = "bar";
 /**
  * Function to build all static visualizations for the father's occupation.
  * Renders a pie chart of the distribution of father's occupation and a bar chart.
  * @param {Array} data - raw dataset to draw from
  * @param {boolean} expanded - whether to render the expanded version of the chart
+ * @param {HTMLElement} containerElement - optional container element
  */
 function fatherJob(data, expanded = false, containerElement = null) {
     // Set container and svg_id based on expanded
@@ -641,8 +645,8 @@ function fatherJob(data, expanded = false, containerElement = null) {
 }
 
 /**
- * Generic Bar functions. Individual as 
- * the function signature was already prededtermined so a generic general function
+ * Generic Bar functions. Individual as the function signature was already 
+ * prededtermined so a generic general function
  * would not work
  */
 

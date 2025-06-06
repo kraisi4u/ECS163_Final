@@ -7,7 +7,7 @@
    /**
  * Translate the education code to readable text
  * @param {the actual code number to transalte} code
- * @returns
+ *  @returns {string} - readable text
  */
 function translateEducationCode(code) {
     const codeMap = {
@@ -224,7 +224,7 @@ const qualificationShortLabels = {
 /**
  *  Translate the job code to readable text
  * @param {Int} code - Int
- * @returns 
+ *  @returns {string} - readable text
  */
 function translateJobCode(code) {
     const jobMap = {
